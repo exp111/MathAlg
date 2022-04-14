@@ -5,8 +5,8 @@ using Graphen;
 using System.Diagnostics;
 
 
-//var files = new string[] {"Graph1", "Graph2", "Graph3"};
-var files = new string[] { "Graph_gross", "Graph_ganzgross", "Graph_ganzganzgross" };
+//var files = new string[] {"Graph1", "Graph2", "Graph3", "Graph_gross", "Graph_ganzgross" };
+var files = new string[] { "Graph_ganzganzgross" };
 foreach (var fileName in files)
 {
     try
@@ -15,9 +15,10 @@ foreach (var fileName in files)
         var stopwatch = new Stopwatch();
         stopwatch.Start();
 #endif
+        Console.WriteLine($"Reading {fileName}");
         var file = File.ReadAllText($"{fileName}.txt");
-        var graph = Graphen.Graph.FromTextFile(file);
-        Console.WriteLine($"Read {fileName} ({graph.KnotenAnzahl} Nodes)");
+        var graph = Graph.FromTextFile(file);
+        Console.WriteLine($"Read {fileName} ({graph.KnotenAnzahl} Knoten, {graph.KantenAnzahl} Kanten)");
 #if MEASURE
         var readTime = stopwatch.Elapsed;
 #endif

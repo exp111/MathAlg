@@ -8,6 +8,7 @@ namespace Graphen
         public List<Kante> Kanten = new();
 
         public int KnotenAnzahl => Knoten.Count;
+        public int KantenAnzahl => Kanten.Count;
 
         public Graph(int num)
         {
@@ -57,7 +58,7 @@ namespace Graphen
 
         public override string ToString()
         {
-            var ret = $"#Nodes: {KnotenAnzahl}";
+            var ret = $"#Knoten: {KnotenAnzahl.ToString("#,##0")}, #Kanten {KantenAnzahl.ToString("#,##0")}";
             ret += "\nKnoten:";
             foreach (var knoten in Knoten)
             {
@@ -105,7 +106,7 @@ namespace Graphen
 
         public override bool Equals(object? obj)
         {
-            if (obj is not Knoten knoten) 
+            if (obj is not Knoten knoten)
                 return false;
 
             return ID == knoten.ID;
