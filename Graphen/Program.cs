@@ -17,8 +17,11 @@ foreach (var fileName in files)
 #endif
         var file = File.ReadAllText($"{fileName}.txt");
         var graph = Graphen.Graph.FromTextFile(file);
-        Console.WriteLine($"Read {fileName}");
-#if PRINT
+        Console.WriteLine($"Read {fileName} ({graph.KnotenAnzahl} Nodes)");
+#if MEASURE
+        var readTime = stopwatch.Elapsed;
+#endif
+#if INFO
         Console.WriteLine(graph);
 #endif
         Console.WriteLine($"Zusammenhangskomponenten: {graph.GetZusammenhangskomponenten()}");
@@ -28,7 +31,11 @@ foreach (var fileName in files)
 #endif
 #if MEASURE
         stopwatch.Stop();
-        Console.WriteLine($"{fileName} took {stopwatch.ElapsedMilliseconds} ms ({stopwatch.Elapsed.Seconds} seconds)");
+        var time = stopwatch.Elapsed;
+        Console.WriteLine($"{fileName} took {(int)time.TotalMilliseconds} ms ({(int)time.TotalSeconds} seconds)");
+        Console.WriteLine($"Read Time: {(int)readTime.TotalMilliseconds} ms ({(int)readTime.TotalSeconds} seconds)");
+        var execTime = time - readTime;
+        Console.WriteLine($"Exec Time: {(int)execTime.TotalMilliseconds} ms ({(int)execTime.TotalSeconds} seconds)");
 #endif
         Console.WriteLine();
     }

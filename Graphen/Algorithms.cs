@@ -49,7 +49,6 @@ namespace Graphen
                         continue;
 
                     // else we have found a new sub graph, then mark all nodes in that graph
-                    Debug.WriteLine($"New sub graph from: {knoten}");
                     count++;
                     Bfs(knoten);
                 }
