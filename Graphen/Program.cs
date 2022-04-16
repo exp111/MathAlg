@@ -4,9 +4,19 @@
 using Graphen;
 using System.Diagnostics;
 
+#if INFO
+var nodeTreshold = 50;
+#endif
 
-//var files = new string[] {"Graph1", "Graph2", "Graph3", "Graph_gross", "Graph_ganzgross" };
-var files = new string[] { "Graph_ganzganzgross" };
+
+var files = new List<string>();
+//files.Add("Graph1");
+//files.Add("Graph2");
+//files.Add("Graph3");
+//files.Add("Graph_gross");
+//files.Add("Graph_ganzgross");
+files.Add("Graph_ganzganzgross");
+
 foreach (var fileName in files)
 {
     try
@@ -23,7 +33,8 @@ foreach (var fileName in files)
         var readTime = stopwatch.Elapsed;
 #endif
 #if INFO
-        Console.WriteLine(graph);
+        if (graph.KnotenAnzahl < nodeTreshold)
+            Console.WriteLine(graph);
 #endif
         Console.WriteLine($"Zusammenhangskomponenten: {graph.GetZusammenhangskomponenten()}");
 #if EXPORT
