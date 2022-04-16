@@ -29,15 +29,21 @@ namespace Graphen
                 var amount = int.Parse(lines[0]);
                 var graph = new Graph(amount);
                 // rest of the lines are the edges in the format "fromID    toID"
-                for (var i = 1; i < lines.Length; i++)
+                Parallel.For(1, lines.Length, i =>
                 {
                     var line = lines[i];
-                    var vals = line.Split("\t");
-                    Debug.Assert(vals.Length == 2); // only from + to
-                    var fromID = int.Parse(vals[0].Trim());
-                    var toID = int.Parse(vals[1].Trim());
-                    graph.AddKante(new Kante(graph.Knoten[fromID], graph.Knoten[toID]));
-                }
+                    // split by \t, essentially equal to line.Split("\t");
+                    var span = line.AsSpan();
+                    var index = span.IndexOf("\t");
+                    var first = span[..index];
+                    var second = span[(index + 1)..];
+                    // parse them into ints
+                    var fromID = int.Parse(first);
+                    var toID = int.Parse(second.TrimEnd()); // trim \r\n from the right side
+                    // put the edge into the graph
+                    var kante = new Kante(graph.Knoten[fromID], graph.Knoten[toID]);
+                    graph.AddKante(kante);
+                });
                 return graph;
             }
             catch (Exception ex)
