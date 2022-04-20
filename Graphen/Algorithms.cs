@@ -13,28 +13,29 @@ namespace Graphen
         {
             try
             {
-                Dictionary<int, bool> marked = new();
+                // so we can remember which nodes are already marked. access via node id
+                bool[] marked = new bool[graph.KnotenAnzahl];
 
                 // marks all nodes from the start node
                 void Bfs(Knoten start)
                 {
                     Queue<Knoten> queue = new();
                     queue.Enqueue(start);
+                    // mark the start first (because we added it)
+                    marked[start.ID] = true;
                     while (queue.Count > 0)
                     {
                         var k = queue.Dequeue();
-                        // already marked beforehand? 
-                        if (marked.ContainsKey(k.ID))
-                            continue;
-
-                        // mark and search
-                        marked[k.ID] = true;
+                        // search neighbours
                         foreach (var kante in k.Kanten)
                         {
                             var other = kante.Start.ID == k.ID ? kante.Ende : kante.Start;
-                            if (marked.ContainsKey(other.ID))
+                            // dont add if the node was already added (and maybe even searched)
+                            if (marked[other.ID])
                                 continue;
 
+                            // mark so we dont add twice
+                            marked[other.ID] = true;
                             queue.Enqueue(other);
                         }
                     }
@@ -45,7 +46,7 @@ namespace Graphen
                 foreach (var knoten in graph.Knoten)
                 {
                     // if its marked we already discovered it
-                    if (marked.ContainsKey(knoten.ID))
+                    if (marked[knoten.ID])
                         continue;
 
                     // else we have found a new sub graph, then mark all nodes in that graph

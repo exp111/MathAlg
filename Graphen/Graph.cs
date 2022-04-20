@@ -28,8 +28,10 @@ namespace Graphen
                 // first line is the amount of nodes
                 var amount = int.Parse(lines[0]);
                 var graph = new Graph(amount);
+                // Contains the edgecount for each node, so we can allocate them in one batch instead of needing to resize
+                int[] edgeCount = new int[amount];
                 // rest of the lines are the edges in the format "fromID    toID"
-                Parallel.For(1, lines.Length, i =>
+                for (var i = 1; i < lines.Length; i++)
                 {
                     var line = lines[i];
                     // split by \t, essentially equal to line.Split("\t");
@@ -42,8 +44,26 @@ namespace Graphen
                     var toID = int.Parse(second.TrimEnd()); // trim \r\n from the right side
                     // put the edge into the graph
                     var kante = new Kante(graph.Knoten[fromID], graph.Knoten[toID]);
-                    graph.AddKante(kante);
-                });
+                    // increase the allocation count
+                    edgeCount[fromID]++;
+                    edgeCount[toID]++;
+                    // only add to the main list rn
+                    graph.Kanten.Add(kante);
+                }
+
+                // Now allocate the lists
+                foreach (var knoten in graph.Knoten)
+                {
+                    knoten.Kanten = new(edgeCount[knoten.ID]);
+                }
+
+                // then add the edge reference to the nodes
+                foreach (var kante in graph.Kanten)
+                {
+                    kante.Start.AddKante(kante);
+                    kante.Ende.AddKante(kante);
+                }
+
                 return graph;
             }
             catch (Exception ex)
@@ -82,12 +102,20 @@ namespace Graphen
     public class Knoten
     {
         public int ID;
-        public List<Kante> Kanten = new();
+        public List<Kante> Kanten;
 
-        public Knoten(int id)
+        internal Knoten(int id)
         {
             ID = id;
         }
+
+        public Knoten(int id, int allocate)
+        {
+            ID = id;
+            Kanten = new(allocate);
+        }
+
+        public int KantenAnzahl => Kanten == null ? Kanten!.Count : 0;
 
         public static bool operator ==(Knoten a, Knoten b)
             => a.ID == b.ID;
@@ -102,7 +130,7 @@ namespace Graphen
 
         public override string ToString()
         {
-            var ret = $"ID: {ID}, #Kanten: {Kanten.Count}";
+            var ret = $"ID: {ID}, #Kanten: {KantenAnzahl}";
             foreach (var kante in Kanten)
             {
                 ret += $" ({ID}->{(kante.Start.ID == ID ? kante.Ende.ID : kante.Start.ID)})";
