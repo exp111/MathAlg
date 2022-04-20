@@ -5,14 +5,15 @@ namespace Graphen
     public class Graph
     {
         public List<Knoten> Knoten;
-        public List<Kante> Kanten = new();
+        public List<Kante> Kanten;
 
         public int KnotenAnzahl => Knoten.Count;
         public int KantenAnzahl => Kanten.Count;
 
-        public Graph(int num)
+        public Graph(int num, int edgeCount = default)
         {
-            Knoten = new List<Knoten>();
+            Kanten = new(edgeCount);
+            Knoten = new List<Knoten>(num);
             for (var i = 0; i < num; i++)
             {
                 var knoten = new Knoten(i);
@@ -27,7 +28,7 @@ namespace Graphen
                 var lines = file.Trim().Split("\n");
                 // first line is the amount of nodes
                 var amount = int.Parse(lines[0]);
-                var graph = new Graph(amount);
+                var graph = new Graph(amount, lines.Length - 1);
                 // Contains the edgecount for each node, so we can allocate them in one batch instead of needing to resize
                 int[] edgeCount = new int[amount];
                 // rest of the lines are the edges in the format "fromID    toID"
