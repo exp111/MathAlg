@@ -13,7 +13,7 @@ namespace Graphen
         public Graph(int num, int edgeCount = default)
         {
             Kanten = new(edgeCount);
-            Knoten = new List<Knoten>(num);
+            Knoten = new(num);
             for (var i = 0; i < num; i++)
             {
                 var knoten = new Knoten(i);
