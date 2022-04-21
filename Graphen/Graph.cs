@@ -21,35 +21,39 @@ namespace Graphen
             }
         }
 
-        public static Graph FromTextFile(string file)
+        public static Graph FromTextFile(FileStream file)
         {
             try
             {
-                var lines = file.Trim().Split("\n");
-                // first line is the amount of nodes
-                var amount = int.Parse(lines[0]);
-                var graph = new Graph(amount, lines.Length - 1);
-                // Contains the edgecount for each node, so we can allocate them in one batch instead of needing to resize
-                int[] edgeCount = new int[amount];
-                // rest of the lines are the edges in the format "fromID    toID"
-                for (var i = 1; i < lines.Length; i++)
+                Graph graph;
+                int[] edgeCount;
+                using (var reader = new StreamReader(file))
                 {
-                    var line = lines[i];
-                    // split by \t, essentially equal to line.Split("\t");
-                    var span = line.AsSpan();
-                    var index = span.IndexOf("\t");
-                    var first = span[..index];
-                    var second = span[(index + 1)..];
-                    // parse them into ints
-                    var fromID = int.Parse(first);
-                    var toID = int.Parse(second.TrimEnd()); // trim \r\n from the right side
-                    // put the edge into the graph
-                    var kante = new Kante(graph.Knoten[fromID], graph.Knoten[toID]);
-                    // increase the allocation count
-                    edgeCount[fromID]++;
-                    edgeCount[toID]++;
-                    // only add to the main list rn
-                    graph.Kanten.Add(kante);
+                    // first line is the amount of nodes
+                    var line = reader.ReadLine()!.TrimEnd();
+                    var amount = int.Parse(line);
+                    graph = new Graph(amount);//, lines.Length - 1);
+                    // Contains the edgecount for each node, so we can allocate them in one batch instead of needing to resize
+                    edgeCount = new int[amount];
+                    // rest of the lines are the edges in the format "fromID    toID"
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        // split by \t, essentially equal to line.Split("\t");
+                        var span = line.AsSpan();
+                        var index = span.IndexOf("\t");
+                        var first = span[..index];
+                        var second = span[(index + 1)..];
+                        // parse them into ints
+                        var fromID = int.Parse(first);
+                        var toID = int.Parse(second.TrimEnd()); // trim \r\n from the right side
+                        // put the edge into the graph
+                        var kante = new Kante(graph.Knoten[fromID], graph.Knoten[toID]);
+                        // increase the allocation count
+                        edgeCount[fromID]++;
+                        edgeCount[toID]++;
+                        // only add to the main list rn
+                        graph.Kanten.Add(kante);
+                    }
                 }
 
                 // Now allocate the lists

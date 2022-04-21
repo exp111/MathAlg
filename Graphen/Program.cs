@@ -1,6 +1,8 @@
 ﻿//#define INFO
 //#define EXPORT
 #define MEASURE
+//#define BENCHMARK
+using BenchmarkDotNet.Running;
 using Graphen;
 using System.Diagnostics;
 
@@ -17,6 +19,10 @@ var files = new List<string>();
 //files.Add("Graph_ganzgross");
 files.Add("Graph_ganzganzgross");
 
+#if BENCHMARK
+BenchmarkRunner.Run<Benchmark>();
+#endif
+
 foreach (var fileName in files)
 {
     try
@@ -26,7 +32,7 @@ foreach (var fileName in files)
         stopwatch.Start();
 #endif
         Console.WriteLine($"Reading {fileName}");
-        var file = File.ReadAllText($"{fileName}.txt");
+        var file = File.OpenRead($"{fileName}.txt");
         var graph = Graph.FromTextFile(file);
         Console.WriteLine($"Read {fileName} ({graph.KnotenAnzahl} Knoten, {graph.KantenAnzahl} Kanten)");
 #if MEASURE
