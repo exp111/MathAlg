@@ -65,8 +65,7 @@ namespace Graphen
                 // then add the edge reference to the nodes
                 foreach (var kante in graph.Kanten)
                 {
-                    kante.Start.AddKante(kante);
-                    kante.Ende.AddKante(kante);
+                    kante.AddReference();
                 }
 
                 return graph;
@@ -83,8 +82,7 @@ namespace Graphen
         {
             Kanten.Add(kante);
             // add references to this edge
-            kante.Start.AddKante(kante);
-            kante.Ende.AddKante(kante);
+            kante.AddReference();
         }
 
         public override string ToString()
@@ -156,11 +154,25 @@ namespace Graphen
     {
         public Knoten Start;
         public Knoten Ende;
+        //TODO: add direction if we need it
 
         public Kante(Knoten start, Knoten ende)
         {
             Start = start;
             Ende = ende;
+        }
+
+        // Adds itself to the nodes
+        public void AddReference()
+        {
+            Start.Kanten.Add(this);
+            Ende.Kanten.Add(this); //TODO: dont add if directed
+        }
+
+        // Given a node that touches the edge, returns the node on the other side. Not defined if the node doesnt touch this edge
+        public Knoten Other(Knoten k)
+        {
+            return Start.ID == k.ID ? Ende : Start;
         }
 
         public override string ToString()

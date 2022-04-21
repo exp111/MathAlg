@@ -29,7 +29,7 @@ namespace Graphen
                         // search neighbours
                         foreach (var kante in k.Kanten)
                         {
-                            var other = kante.Start.ID == k.ID ? kante.Ende : kante.Start;
+                            var other = kante.Other(k);
                             // dont add if the node was already added (and maybe even searched)
                             if (marked[other.ID])
                                 continue;
