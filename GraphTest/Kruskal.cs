@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace GraphTest
 {
-    internal class Prim
+    internal class Kruskal
     {
         [SetUp]
         public void Setup()
@@ -22,46 +22,46 @@ namespace GraphTest
         [Test]
         public void TestGraph15_18()
         {
-            Assert.AreEqual("4.14000", PrimTest("G_15_18").ToString("0.00000", CultureInfo.InvariantCulture));
+            Assert.AreEqual("4.14000", KruskalTest("G_15_18").ToString("0.00000", CultureInfo.InvariantCulture));
         }
 
         [Test]
         public void TestGraph1k2k()
         {
-            Assert.AreEqual("287.32286", PrimTest("G_1_2").ToString("0.00000", CultureInfo.InvariantCulture));
+            Assert.AreEqual("287.32286", KruskalTest("G_1_2").ToString("0.00000", CultureInfo.InvariantCulture));
         }
 
         [Test]
         public void TestGraph1k20k()
         {
-            Assert.AreEqual("36.86275", PrimTest("G_1_20").ToString("0.00000", CultureInfo.InvariantCulture));
+            Assert.AreEqual("36.86275", KruskalTest("G_1_20").ToString("0.00000", CultureInfo.InvariantCulture));
         }
 
         [Test]
         public void TestGraph1k200k()
         {
-            Assert.AreEqual("12.68182", PrimTest("G_1_200").ToString("0.00000", CultureInfo.InvariantCulture));
+            Assert.AreEqual("12.68182", KruskalTest("G_1_200").ToString("0.00000", CultureInfo.InvariantCulture));
         }
 
         [Test]
         public void TestGraph10k20k()
         {
-            Assert.AreEqual("2785.62417", PrimTest("G_10_20").ToString("0.00000", CultureInfo.InvariantCulture));
+            Assert.AreEqual("2785.62417", KruskalTest("G_10_20").ToString("0.00000", CultureInfo.InvariantCulture));
         }
 
         [Test]
         public void TestGraph10k200k()
         {
-            Assert.AreEqual("372.14417", PrimTest("G_10_200").ToString("0.00000", CultureInfo.InvariantCulture));
+            Assert.AreEqual("372.14417", KruskalTest("G_10_200").ToString("0.00000", CultureInfo.InvariantCulture));
         }
 
         [Test]
         public void TestGraph100k200k()
         {
-            Assert.AreEqual("27550.51488", PrimTest("G_100_200").ToString("0.00000", CultureInfo.InvariantCulture));
+            Assert.AreEqual("27550.51488", KruskalTest("G_100_200").ToString("0.00000", CultureInfo.InvariantCulture));
         }
 
-        private double PrimTest(string fileName)
+        private double KruskalTest(string fileName)
         {
             try
             {
@@ -71,8 +71,8 @@ namespace GraphTest
                 var graph = Graph.FromTextFileWeighted($"{fileName}.txt");
                 Console.WriteLine($"Read {fileName} ({graph.KnotenAnzahl} Knoten, {graph.KantenAnzahl} Kanten)");
                 var readTime = stopwatch.Elapsed;
-                var count = graph.Prim();
-                Console.WriteLine($"Prim: {count}");
+                var count = graph.Kruskal();
+                Console.WriteLine($"Kruskal: {count}");
                 stopwatch.Stop();
                 var time = stopwatch.Elapsed;
                 Console.WriteLine($"{fileName} took {(int)time.TotalMilliseconds} ms ({(int)time.TotalSeconds} seconds)");
