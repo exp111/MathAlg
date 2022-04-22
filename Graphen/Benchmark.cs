@@ -7,20 +7,18 @@ namespace Graphen
     [RankColumn]
     public class Benchmark
     {
-        private static readonly string fileName = @"E:\D\Visual Studio\Uni\MathAlg\Graphen\Graphen\bin\Release\net6.0\Graph_ganzganzgross.txt";
+        private static readonly string fileName = @"E:\D\Visual Studio\Uni\MathAlg\Graphen\data\Graph_ganzganzgross.txt";
 
         [Benchmark]
         public void BenchmarkRead()
         {
-            var file = File.OpenRead(fileName);
-            var graph = Graph.FromTextFile(file);
+            var graph = Graph.FromTextFile(fileName);
         }
 
         [Benchmark]
         public void BenchmarkText()
         {
-            var file = File.OpenRead(fileName);
-            var graph = Graph.FromTextFile(file);
+            var graph = Graph.FromTextFile(fileName);
         }
     }
 }

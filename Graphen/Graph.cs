@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Globalization;
 
 namespace Graphen
 {
@@ -21,12 +22,13 @@ namespace Graphen
             }
         }
 
-        public static Graph FromTextFile(FileStream file)
+        public static Graph FromTextFile(string fileName)
         {
             try
             {
                 Graph graph;
                 int[] edgeCount;
+                var file = File.OpenRead(fileName);
                 using (var reader = new StreamReader(file))
                 {
                     // first line is the amount of nodes
@@ -73,6 +75,68 @@ namespace Graphen
             catch (Exception ex)
             {
                 Console.WriteLine($"Exception during Graph.FromTextFile: {ex}");
+            }
+
+            return new Graph(0);
+        }
+
+        public static Graph FromTextFileWeighted(string fileName)
+        {
+            try
+            {
+                Graph graph;
+                int[] edgeCount;
+                var file = File.OpenRead(fileName);
+                using (var reader = new StreamReader(file))
+                {
+                    // first line is the amount of nodes
+                    var line = reader.ReadLine()!.TrimEnd();
+                    var amount = int.Parse(line);
+                    graph = new Graph(amount);//, lines.Length - 1);
+                    // Contains the edgecount for each node, so we can allocate them in one batch instead of needing to resize
+                    edgeCount = new int[amount];
+                    // rest of the lines are the edges in the format "fromID    toID    weight"
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        // split by \t, essentially equal to line.Split("\t");
+                        var span = line.AsSpan();
+                        var index = span.IndexOf("\t");
+                        var first = span[..index];
+                        span = span[(index + 1)..]; // move string forward to ignore first \t
+                        var secondIndex = span.IndexOf("\t");
+                        var second = span[..secondIndex];
+                        var third = span[(secondIndex + 1)..];
+                        // parse them into ints
+                        var fromID = int.Parse(first);
+                        var toID = int.Parse(second); // trim \r\n from the right side
+                        var weight = double.Parse(third.TrimEnd(), NumberStyles.Float, CultureInfo.InvariantCulture);
+                        // put the edge into the graph
+                        var kante = new Kante(graph.Knoten[fromID], graph.Knoten[toID], weight);
+                        // increase the allocation count
+                        edgeCount[fromID]++;
+                        edgeCount[toID]++;
+                        // only add to the main list rn
+                        graph.Kanten.Add(kante);
+                    }
+                }
+
+                // Now allocate the lists
+                foreach (var knoten in graph.Knoten)
+                {
+                    knoten.Kanten = new(edgeCount[knoten.ID]);
+                }
+
+                // then add the edge reference to the nodes
+                foreach (var kante in graph.Kanten)
+                {
+                    kante.AddReference();
+                }
+
+                return graph;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception during Graph.FromTextFileWeighted: {ex}");
             }
 
             return new Graph(0);
@@ -154,12 +218,14 @@ namespace Graphen
     {
         public Knoten Start;
         public Knoten Ende;
+        public double? Weight;
         //TODO: add direction if we need it
 
-        public Kante(Knoten start, Knoten ende)
+        public Kante(Knoten start, Knoten ende, double? weight = null)
         {
             Start = start;
             Ende = ende;
+            Weight = weight;
         }
 
         // Adds itself to the nodes

@@ -62,5 +62,61 @@ namespace Graphen
             }
             return 0;
         }
+
+        //TODO: optimize, return MST class?
+        public static double Prim(this Graph graph)
+        {
+            PriorityQueue<Kante, double> queue = new();
+            bool[] marked = new bool[graph.Knoten.Count];
+            var edgeCount = graph.KnotenAnzahl - 1; // n - 1
+            List<Kante> kanten = new(edgeCount);
+
+            var start = graph.Knoten[0];
+            marked[start.ID] = true;
+            foreach (var k in start.Kanten)
+            {
+                queue.Enqueue(k, k.Weight!.Value);
+            }
+
+            while (queue.Count > 0 && kanten.Count < edgeCount)
+            {
+                var best = queue.Dequeue();
+                // check if the other side was marked in the meantime
+                if (marked[best.Start.ID] && marked[best.Ende.ID])
+                    continue;
+
+                // add to edge list
+                kanten.Add(best);
+                // get node we havent checked
+                var other = best.Start;
+                if (marked[other.ID])
+                    other = best.Ende;
+
+                // mark and add other edges to the queue
+                marked[other.ID] = true;
+                foreach (var k in other.Kanten)
+                {
+                    // check if node on the other end is already marked so we dont get a circle
+                    if (marked[k.Other(other).ID])
+                        continue;
+
+                    queue.Enqueue(k, k.Weight!.Value);
+                }
+            }
+
+            var count = 0.0d;
+            foreach (var k in kanten)
+                count += k.Weight!.Value;
+
+            return count;
+        }
+
+        //TODO: kruskal, return MST class?
+        public static int Kruskal(this Graph graph)
+        {
+            // set set id (int) in array (access by node id)
+            // save sets in to sets array (access by set id)
+            return 0;
+        }
     }
 }

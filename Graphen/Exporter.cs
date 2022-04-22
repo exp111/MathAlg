@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,7 +32,8 @@ namespace Graphen
                 var edgeCount = 0;
                 foreach (var kante in graph.Kanten)
                 {
-                    ret += $"<edge source=\"{kante.Start.ID}\" target=\"{kante.Ende.ID}\" isDirect=\"false\" weight=\"1\" useWeight=\"false\" id=\"{10000 + edgeCount}\" text=\"\" upText=\"\" arrayStyleStart=\"\" arrayStyleFinish=\"\" model_width=\"4\" model_type=\"0\" model_curvedValue=\"0.1\"></edge>";
+                    var weight = kante.Weight.HasValue ? kante.Weight.Value.ToString(CultureInfo.InvariantCulture) : "1";
+                    ret += $"<edge source=\"{kante.Start.ID}\" target=\"{kante.Ende.ID}\" isDirect=\"false\" weight=\"{weight}\" useWeight=\"false\" id=\"{10000 + edgeCount}\" text=\"\" upText=\"\" arrayStyleStart=\"\" arrayStyleFinish=\"\" model_width=\"4\" model_type=\"0\" model_curvedValue=\"0.1\"></edge>";
                     edgeCount++;
                 }
                 ret += "</graph>";
