@@ -63,6 +63,7 @@ namespace Graphen
             return 0;
         }
 
+        //TODO: use fibonacci heap for prio queue?
         //TODO: optimize
         public static Graph Prim(this Graph graph)
         {
@@ -122,8 +123,35 @@ namespace Graphen
             // set set id (int) in array (access by node id)
             // save sets in to sets array (access by set id)
             int[] nodes = new int[graph.Knoten.Count];
-            Dictionary<int, List<int>?> sets = new();
-            var setCounter = 1;
+            for (var i = 0; i < nodes.Length; i++)
+            {
+                nodes[i] = i;
+            }
+            int find(int k)
+            {
+                //TODO: path compression
+                var cur = k;
+                while (nodes[cur] != cur)
+                    cur = nodes[cur];
+                return cur;
+            }
+
+            void union(int nodeID, int otherID)
+            {
+                var node = graph.Knoten[nodeID];
+                var otherNode = graph.Knoten[otherID];
+
+                // union-by-rank (make lower ranked parented to the higher rank)
+                if (node.Rank < otherNode.Rank)
+                    nodes[nodeID] = otherID;
+                else if (otherNode.Rank > node.Rank)
+                    nodes[otherID] = nodeID;
+                else // if both ranks are the same, make one higher rank
+                {
+                    nodes[otherID] = nodeID;
+                    node.Rank++;
+                }
+            }
 
             while (queue.Count > 0 && kanten.Count < edgeCount)
             {
@@ -132,54 +160,78 @@ namespace Graphen
                 var node = best.Start;
                 var other = best.Ende;
 
-                // is it unmarked?
-                if (nodes[node.ID] != 0)
-                {
-                    // first one not unmarked. work with the other one
-                    node = best.Ende;
-                    other = best.Start;
-                }
-                else
-                {
-                    // both are empty => make new set
-                    if (nodes[other.ID] == 0)
-                    {
-                        nodes[node.ID] = setCounter;
-                        nodes[other.ID] = setCounter;
-                        sets[setCounter] = new List<int> { node.ID, other.ID };
-                        setCounter++;
-                        kanten.Add(best);
-                        continue; // we did our job
-                    }
-                }
-
+                var nodeParent = find(node.ID);
+                var otherParent = find(other.ID);
                 // both sides are in the same set? already connected
-                if (nodes[best.Start.ID] == nodes[best.Ende.ID])
+                if (nodeParent == otherParent)
                     continue;
-
-                // only this one unmarked? => join into other set
-                if (nodes[node.ID] == 0)
-                {
-                    var otherSetID = nodes[other.ID];
-                    // add to set
-                    nodes[node.ID] = otherSetID;
-                    sets[otherSetID]!.Add(node.ID);
-                    // we were successful
-                    kanten.Add(best);
-                    continue;
-                }
 
                 // both sides are in different sets? merge
-                var mergerSetID = nodes[node.ID];
-                var mergeeSetID = nodes[other.ID];
-                var mergeeSet = sets[mergeeSetID]!;
+                union(nodeParent, otherParent);
+                kanten.Add(best);
+            }
 
-                sets[mergerSetID]!.AddRange(mergeeSet);
-                foreach (var mergee in mergeeSet)
+            // put it into a new graph
+            return new Graph(graph.KnotenAnzahl, kanten);
+        }
+
+        public static Graph KruskalB(this Graph graph)
+        {
+            PriorityQueue<Kante, double> queue = new();
+            foreach (var k in graph.Kanten)
+            {
+                queue.Enqueue(k, k.Weight!.Value);
+            }
+
+            var edgeCount = graph.KnotenAnzahl - 1; // n - 1
+            List<Kante> kanten = new(edgeCount);
+            // set set id (int) in array (access by node id)
+            // save sets in to sets array (access by set id)
+            int[] nodes = new int[graph.Knoten.Count];
+            for (var i = 0; i < nodes.Length; i++)
+            {
+                nodes[i] = i;
+            }
+            int find(int k)
+            {
+                var cur = k;
+                while (nodes[cur] != cur)
+                    cur = nodes[cur];
+                return cur;
+            }
+
+            void union(int nodeID, int otherID)
+            {
+                var node = graph.Knoten[nodeID];
+                var otherNode = graph.Knoten[otherID];
+
+                // union-by-rank (make lower ranked parented to the higher rank)
+                if (node.Rank < otherNode.Rank)
+                    nodes[nodeID] = otherID;
+                else if (otherNode.Rank > node.Rank)
+                    nodes[otherID] = nodeID;
+                else // if both ranks are the same, make one higher rank
                 {
-                    nodes[mergee] = mergerSetID;
+                    nodes[otherID] = nodeID;
+                    node.Rank++;
                 }
-                sets[mergeeSetID] = null;
+            }
+
+            while (queue.Count > 0 && kanten.Count < edgeCount)
+            {
+                var best = queue.Dequeue();
+
+                var node = best.Start;
+                var other = best.Ende;
+
+                var nodeParent = find(node.ID);
+                var otherParent = find(other.ID);
+                // both sides are in the same set? already connected
+                if (nodeParent == otherParent)
+                    continue;
+
+                // both sides are in different sets? merge
+                union(nodeParent, otherParent);
                 kanten.Add(best);
             }
 

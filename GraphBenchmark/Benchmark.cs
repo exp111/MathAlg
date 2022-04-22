@@ -7,20 +7,20 @@ using Graphen;
 public class Benchmark
 {
     private static readonly string path = @"E:\D\Visual Studio\Uni\MathAlg\Graphen\data\";
-    private static readonly string fileName = "G_10_20.txt";
+    private static readonly string fileName = "G_10_200.txt";
     private static readonly string file = Path.Combine(path, fileName);
 
     [Benchmark(Baseline = true)]
     public Graph BenchmarkBase()
     {
         var graph = Graph.FromTextFileWeighted(file);
-        return graph.Prim();
+        return graph.Kruskal();
     }
 
     [Benchmark]
-    public Graph BenchmarkText()
+    public Graph BenchmarkB()
     {
         var graph = Graph.FromTextFileWeighted(file);
-        return graph.Prim();
+        return graph.KruskalB();
     }
 }
