@@ -33,12 +33,27 @@ namespace Graphen
                 var knoten = new Knoten(i);
                 Knoten.Add(knoten);
             }
+            int[] edgeCount = new int[num];
+
             // change the edge references to touch this one
             for (var i = 0; i < edges.Count; i++)
             {
                 var edge = edges[i];
                 edge.Start = Knoten[edge.Start.ID];
                 edge.Ende = Knoten[edge.Ende.ID];
+                edgeCount[edge.Start.ID]++;
+                edgeCount[edge.Ende.ID]++;
+            }
+
+            foreach (var knoten in Knoten)
+            {
+                knoten.Kanten = new(edgeCount[knoten.ID]);
+            }
+
+            // then add the edge reference to the nodes
+            foreach (var kante in Kanten)
+            {
+                kante.AddReference();
             }
         }
 

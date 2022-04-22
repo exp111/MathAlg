@@ -1,17 +1,17 @@
 ﻿#define MEASURE
-#define EXPORT
+//#define EXPORT
 using Graphen;
 using System.Diagnostics;
 
 Directory.SetCurrentDirectory(@"E:\D\Visual Studio\Uni\MathAlg\Graphen\data");
 var files = new List<string>();
 //files.Add("G_1_2");
-files.Add("G_15_18");
+//files.Add("G_15_18");
 //files.Add("G_1_20");
 //files.Add("G_1_200");
 //files.Add("G_10_20");
 //files.Add("G_10_200");
-//files.Add("G_100_200");
+files.Add("G_100_200");
 
 foreach (var fileName in files)
 {
@@ -24,10 +24,21 @@ foreach (var fileName in files)
         var graph = Graph.FromTextFileWeighted($"{fileName}.txt");
         Console.WriteLine($"Read {fileName} ({graph.KnotenAnzahl} Knoten, {graph.KantenAnzahl} Kanten)");
         var readTime = stopwatch.Elapsed;
-
-        Console.WriteLine($"Prim: {graph.Prim()}");
+        var prim = graph.Prim();
+        var count = 0d;
+        foreach (var k in prim.Kanten)
+        {
+            count += k.Weight!.Value;
+        }
+        Console.WriteLine($"Prim: {count}");
         var primTime = stopwatch.Elapsed - readTime;
-        Console.WriteLine($"Kruskal: {graph.Kruskal()}");
+        var krusk = graph.Kruskal();
+        count = 0d; 
+        foreach (var k in krusk.Kanten)
+        {
+            count += k.Weight!.Value;
+        }
+        Console.WriteLine($"Kruskal: {count}");
         var kruskalTime = stopwatch.Elapsed - primTime - readTime;
 
         stopwatch.Stop();
