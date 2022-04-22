@@ -205,7 +205,6 @@ namespace Graphen
     {
         public int ID;
         public List<Kante> Kanten;
-        public int Rank;
 
         public Knoten(int id)
         {

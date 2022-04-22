@@ -2,7 +2,7 @@
 using Graphen;
 
 [MemoryDiagnoser]
-[Orderer(BenchmarkDotNet.Order.SummaryOrderPolicy.FastestToSlowest)]
+[Orderer(BenchmarkDotNet.Order.SummaryOrderPolicy.Declared)]
 [RankColumn]
 public class Benchmark
 {

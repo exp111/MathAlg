@@ -109,6 +109,10 @@ namespace Graphen
             return new Graph(graph.KnotenAnzahl, kanten);
         }
 
+        public class SubSet
+        {
+            public int Parent, Rank;
+        }
         //TODO: optimize
         public static Graph Kruskal(this Graph graph)
         {
@@ -122,33 +126,32 @@ namespace Graphen
             List<Kante> kanten = new(edgeCount);
             // set set id (int) in array (access by node id)
             // save sets in to sets array (access by set id)
-            int[] nodes = new int[graph.Knoten.Count];
+            SubSet[] nodes = new SubSet[graph.Knoten.Count];
             for (var i = 0; i < nodes.Length; i++)
             {
-                nodes[i] = i;
+                nodes[i] = new SubSet() { Parent = i };
             }
             int find(int k)
             {
-                //TODO: path compression
                 var cur = k;
-                while (nodes[cur] != cur)
-                    cur = nodes[cur];
+                while (nodes[cur].Parent != cur)
+                    cur = nodes[cur].Parent;
                 return cur;
             }
 
             void union(int nodeID, int otherID)
             {
-                var node = graph.Knoten[nodeID];
-                var otherNode = graph.Knoten[otherID];
+                var node = nodes[nodeID];
+                var other = nodes[otherID];
 
                 // union-by-rank (make lower ranked parented to the higher rank)
-                if (node.Rank < otherNode.Rank)
-                    nodes[nodeID] = otherID;
-                else if (otherNode.Rank > node.Rank)
-                    nodes[otherID] = nodeID;
+                if (node.Rank < other.Rank)
+                    node.Parent = otherID;
+                else if (other.Rank > node.Rank)
+                    other.Parent = nodeID;
                 else // if both ranks are the same, make one higher rank
                 {
-                    nodes[otherID] = nodeID;
+                    other.Parent = nodeID;
                     node.Rank++;
                 }
             }
@@ -187,32 +190,32 @@ namespace Graphen
             List<Kante> kanten = new(edgeCount);
             // set set id (int) in array (access by node id)
             // save sets in to sets array (access by set id)
-            int[] nodes = new int[graph.Knoten.Count];
+            SubSet[] nodes = new SubSet[graph.Knoten.Count];
             for (var i = 0; i < nodes.Length; i++)
             {
-                nodes[i] = i;
+                nodes[i] = new SubSet() { Parent = i };
             }
             int find(int k)
             {
                 var cur = k;
-                while (nodes[cur] != cur)
-                    cur = nodes[cur];
+                while (nodes[cur].Parent != cur)
+                    cur = nodes[cur].Parent;
                 return cur;
             }
 
             void union(int nodeID, int otherID)
             {
-                var node = graph.Knoten[nodeID];
-                var otherNode = graph.Knoten[otherID];
+                var node = nodes[nodeID];
+                var other = nodes[otherID];
 
                 // union-by-rank (make lower ranked parented to the higher rank)
-                if (node.Rank < otherNode.Rank)
-                    nodes[nodeID] = otherID;
-                else if (otherNode.Rank > node.Rank)
-                    nodes[otherID] = nodeID;
+                if (node.Rank < other.Rank)
+                    node.Parent = otherID;
+                else if (other.Rank > node.Rank)
+                    other.Parent = nodeID;
                 else // if both ranks are the same, make one higher rank
                 {
-                    nodes[otherID] = nodeID;
+                    other.Parent = nodeID;
                     node.Rank++;
                 }
             }
