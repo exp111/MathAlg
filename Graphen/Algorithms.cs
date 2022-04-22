@@ -63,8 +63,8 @@ namespace Graphen
             return 0;
         }
 
-        //TODO: optimize, return MST class?
-        public static double Prim(this Graph graph)
+        //TODO: optimize
+        public static Graph Prim(this Graph graph)
         {
             PriorityQueue<Kante, double> queue = new();
             bool[] marked = new bool[graph.Knoten.Count];
@@ -104,15 +104,12 @@ namespace Graphen
                 }
             }
 
-            var count = 0.0d;
-            foreach (var k in kanten)
-                count += k.Weight!.Value;
-
-            return count;
+            // put it into a new graph
+            return new Graph(graph.KnotenAnzahl, kanten);
         }
 
-        //TODO: optimize, return MST class?
-        public static double Kruskal(this Graph graph)
+        //TODO: optimize
+        public static Graph Kruskal(this Graph graph)
         {
             PriorityQueue<Kante, double> queue = new();
             foreach (var k in graph.Kanten)
@@ -186,11 +183,8 @@ namespace Graphen
                 kanten.Add(best);
             }
 
-            var count = 0.0d;
-            foreach (var k in kanten)
-                count += k.Weight!.Value;
-
-            return count;
+            // put it into a new graph
+            return new Graph(graph.KnotenAnzahl, kanten);
         }
     }
 }

@@ -22,6 +22,26 @@ namespace Graphen
             }
         }
 
+        // Makes a new graph from a list of edges. Dies if edges connect to a unknown id
+        // Also changes the list you gave into it
+        public Graph(int num, List<Kante> edges)
+        {
+            Kanten = edges;
+            Knoten = new(num);
+            for (var i = 0; i < num; i++)
+            {
+                var knoten = new Knoten(i);
+                Knoten.Add(knoten);
+            }
+            // change the edge references to touch this one
+            for (var i = 0; i < edges.Count; i++)
+            {
+                var edge = edges[i];
+                edge.Start = Knoten[edge.Start.ID];
+                edge.Ende = Knoten[edge.Ende.ID];
+            }
+        }
+
         public static Graph FromTextFile(string fileName)
         {
             try
@@ -171,7 +191,7 @@ namespace Graphen
         public int ID;
         public List<Kante> Kanten;
 
-        internal Knoten(int id)
+        public Knoten(int id)
         {
             ID = id;
         }

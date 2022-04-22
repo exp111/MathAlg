@@ -71,7 +71,12 @@ namespace GraphTest
                 var graph = Graph.FromTextFileWeighted($"{fileName}.txt");
                 Console.WriteLine($"Read {fileName} ({graph.KnotenAnzahl} Knoten, {graph.KantenAnzahl} Kanten)");
                 var readTime = stopwatch.Elapsed;
-                var count = graph.Kruskal();
+                var mst = graph.Kruskal();
+                var count = 0d;
+                foreach (var k in mst.Kanten)
+                {
+                    count += k.Weight!.Value;
+                }
                 Console.WriteLine($"Kruskal: {count}");
                 stopwatch.Stop();
                 var time = stopwatch.Elapsed;
@@ -84,7 +89,7 @@ namespace GraphTest
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Exception during RunZusammenhangkomponentenTest: {ex}");
+                Console.WriteLine($"Exception during KruskalTest: {ex}");
             }
             return 0;
         }

@@ -1,12 +1,7 @@
 ﻿#define MEASURE
 #define EXPORT
-using BenchmarkDotNet.Running;
 using Graphen;
 using System.Diagnostics;
-
-#if BENCHMARK
-BenchmarkRunner.Run<Benchmark>();
-#endif
 
 Directory.SetCurrentDirectory(@"E:\D\Visual Studio\Uni\MathAlg\Graphen\data");
 var files = new List<string>();
@@ -17,10 +12,6 @@ files.Add("G_15_18");
 //files.Add("G_10_20");
 //files.Add("G_10_200");
 //files.Add("G_100_200");
-
-#if BENCHMARK
-BenchmarkRunner.Run<Benchmark>();
-#endif
 
 foreach (var fileName in files)
 {
