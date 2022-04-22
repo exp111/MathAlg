@@ -68,7 +68,51 @@ namespace Graphen
         public static Graph Prim(this Graph graph)
         {
             PriorityQueue<Kante, double> queue = new();
-            bool[] marked = new bool[graph.Knoten.Count];
+            bool[] marked = new bool[graph.KnotenAnzahl];
+            var edgeCount = graph.KnotenAnzahl - 1; // n - 1
+            List<Kante> kanten = new(edgeCount);
+
+            var start = graph.Knoten[0];
+            marked[start.ID] = true;
+            foreach (var k in start.Kanten)
+            {
+                queue.Enqueue(k, k.Weight!.Value);
+            }
+
+            while (queue.Count > 0 && kanten.Count < edgeCount)
+            {
+                var best = queue.Dequeue();
+                // check if the other side was marked in the meantime
+                if (marked[best.Start.ID] && marked[best.Ende.ID])
+                    continue;
+
+                // add to edge list
+                kanten.Add(best);
+                // get node we havent checked
+                var other = best.Start;
+                if (marked[other.ID])
+                    other = best.Ende;
+
+                // mark and add other edges to the queue
+                marked[other.ID] = true;
+                foreach (var k in other.Kanten)
+                {
+                    // check if node on the other end is already marked so we dont get a circle
+                    if (marked[k.Other(other).ID])
+                        continue;
+
+                    queue.Enqueue(k, k.Weight!.Value);
+                }
+            }
+
+            // put it into a new graph
+            return new Graph(graph.KnotenAnzahl, kanten);
+        }
+
+        public static Graph PrimB(this Graph graph)
+        {
+            PriorityQueue<Kante, double> queue = new();
+            bool[] marked = new bool[graph.KnotenAnzahl];
             var edgeCount = graph.KnotenAnzahl - 1; // n - 1
             List<Kante> kanten = new(edgeCount);
 
@@ -113,7 +157,7 @@ namespace Graphen
         {
             public int Parent, Rank;
         }
-        //TODO: optimize
+        //TODO: optimize more? maybe path compression?
         public static Graph Kruskal(this Graph graph)
         {
             PriorityQueue<Kante, double> queue = new();

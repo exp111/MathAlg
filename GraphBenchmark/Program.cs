@@ -1,3 +1,5 @@
 ﻿using BenchmarkDotNet.Running;
 
-BenchmarkRunner.Run<Benchmark>();
+BenchmarkRunner.Run<BenchmarkSmall>();
+//BenchmarkRunner.Run<BenchmarkMedium>();
+//BenchmarkRunner.Run<BenchmarkBig>();
