@@ -23,10 +23,10 @@ namespace Graphen
         }
 
         // Makes a new graph from a list of edges. Dies if edges connect to a unknown id
-        // Also changes the list you gave into it
         public Graph(int num, List<Kante> edges)
         {
-            Kanten = edges;
+            // copy the edges over
+            Kanten = new(edges);
             Knoten = new(num);
             for (var i = 0; i < num; i++)
             {
@@ -36,9 +36,8 @@ namespace Graphen
             int[] edgeCount = new int[num];
 
             // change the edge references to touch this one
-            for (var i = 0; i < edges.Count; i++)
+            foreach (var edge in Kanten)
             {
-                var edge = edges[i];
                 edge.Start = Knoten[edge.Start.ID];
                 edge.Ende = Knoten[edge.Ende.ID];
                 edgeCount[edge.Start.ID]++;
