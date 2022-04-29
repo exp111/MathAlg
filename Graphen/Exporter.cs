@@ -21,19 +21,19 @@ namespace Graphen
                 var ret = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><graphml>";
                 ret += $"<graph id=\"Graph\" uidGraph=\"{graph.KnotenAnzahl}\" uidEdge=\"{10000 + graph.Kanten.Count}\">";
                 // add nodes
-                foreach (var knoten in graph.Knoten)
+                foreach (var node in graph.Knoten)
                 {
                     //TODO: calc a better positioning alg
-                    var x = (knoten.ID / rows) * (size + offset);
-                    var y = (knoten.ID % rows) * (size + offset);
-                    ret += $"<node positionX=\"{x}\" positionY=\"{y}\" id=\"{knoten.ID}\" mainText=\"{knoten.ID}\" upText=\"\" size=\"{size}\"></node>";
+                    var x = (node.ID / rows) * (size + offset);
+                    var y = (node.ID % rows) * (size + offset);
+                    ret += $"<node positionX=\"{x}\" positionY=\"{y}\" id=\"{node.ID}\" mainText=\"{node.ID}\" upText=\"\" size=\"{size}\"></node>";
                 }
                 // add edges
                 var edgeCount = 0;
-                foreach (var kante in graph.Kanten)
+                foreach (var edge in graph.Kanten)
                 {
-                    var weight = kante.Weight.HasValue ? kante.Weight.Value.ToString(CultureInfo.InvariantCulture) : "1";
-                    ret += $"<edge source=\"{kante.Start.ID}\" target=\"{kante.Ende.ID}\" isDirect=\"false\" weight=\"{weight}\" useWeight=\"false\" id=\"{10000 + edgeCount}\" text=\"\" upText=\"\" arrayStyleStart=\"\" arrayStyleFinish=\"\" model_width=\"4\" model_type=\"0\" model_curvedValue=\"0.1\"></edge>";
+                    var weight = edge.Weight.HasValue ? edge.Weight.Value.ToString(CultureInfo.InvariantCulture) : "1";
+                    ret += $"<edge source=\"{edge.Start.ID}\" target=\"{edge.Ende.ID}\" isDirect=\"false\" weight=\"{weight}\" useWeight=\"false\" id=\"{10000 + edgeCount}\" text=\"\" upText=\"\" arrayStyleStart=\"\" arrayStyleFinish=\"\" model_width=\"4\" model_type=\"0\" model_curvedValue=\"0.1\"></edge>";
                     edgeCount++;
                 }
                 ret += "</graph>";
@@ -44,7 +44,7 @@ namespace Graphen
             {
                 Console.WriteLine($"Exception during ExportToGraphML: {ex}");
             }
-            return new string[0];
+            return Array.Empty<string>();
         }
     }
 }

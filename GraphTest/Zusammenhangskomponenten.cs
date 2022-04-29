@@ -60,7 +60,7 @@ namespace GraphTest
                 var graph = Graph.FromTextFile($"{fileName}.txt");
                 Console.WriteLine($"Read {fileName} ({graph.KnotenAnzahl} Knoten, {graph.KantenAnzahl} Kanten)");
                 var readTime = stopwatch.Elapsed;
-                var count = graph.GetZusammenhangskomponenten();
+                var count = graph.GetConnectedComponents();
                 Console.WriteLine($"Zusammenhangskomponenten: {count}");
                 stopwatch.Stop();
                 var time = stopwatch.Elapsed;

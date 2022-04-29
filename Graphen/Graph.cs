@@ -17,8 +17,8 @@ namespace Graphen
             Knoten = new(num);
             for (var i = 0; i < num; i++)
             {
-                var knoten = new Knoten(i);
-                Knoten.Add(knoten);
+                var node = new Knoten(i);
+                Knoten.Add(node);
             }
         }
 
@@ -30,8 +30,8 @@ namespace Graphen
             Knoten = new(num);
             for (var i = 0; i < num; i++)
             {
-                var knoten = new Knoten(i);
-                Knoten.Add(knoten);
+                var node = new Knoten(i);
+                Knoten.Add(node);
             }
             int[] edgeCount = new int[num];
 
@@ -44,15 +44,15 @@ namespace Graphen
                 edgeCount[edge.Ende.ID]++;
             }
 
-            foreach (var knoten in Knoten)
+            foreach (var node in Knoten)
             {
-                knoten.Kanten = new(edgeCount[knoten.ID]);
+                node.Kanten = new(edgeCount[node.ID]);
             }
 
             // then add the edge reference to the nodes
-            foreach (var kante in Kanten)
+            foreach (var edge in Kanten)
             {
-                kante.AddReference();
+                edge.AddReference();
             }
         }
 
@@ -83,25 +83,25 @@ namespace Graphen
                         var fromID = int.Parse(first);
                         var toID = int.Parse(second.TrimEnd()); // trim \r\n from the right side
                         // put the edge into the graph
-                        var kante = new Kante(graph.Knoten[fromID], graph.Knoten[toID]);
+                        var edge = new Kante(graph.Knoten[fromID], graph.Knoten[toID]);
                         // increase the allocation count
                         edgeCount[fromID]++;
                         edgeCount[toID]++;
                         // only add to the main list rn
-                        graph.Kanten.Add(kante);
+                        graph.Kanten.Add(edge);
                     }
                 }
 
                 // Now allocate the lists
-                foreach (var knoten in graph.Knoten)
+                foreach (var node in graph.Knoten)
                 {
-                    knoten.Kanten = new(edgeCount[knoten.ID]);
+                    node.Kanten = new(edgeCount[node.ID]);
                 }
 
                 // then add the edge reference to the nodes
-                foreach (var kante in graph.Kanten)
+                foreach (var edge in graph.Kanten)
                 {
-                    kante.AddReference();
+                    edge.AddReference();
                 }
 
                 return graph;
@@ -145,25 +145,25 @@ namespace Graphen
                         var toID = int.Parse(second); // trim \r\n from the right side
                         var weight = double.Parse(third.TrimEnd(), NumberStyles.Float, CultureInfo.InvariantCulture);
                         // put the edge into the graph
-                        var kante = new Kante(graph.Knoten[fromID], graph.Knoten[toID], weight);
+                        var edge = new Kante(graph.Knoten[fromID], graph.Knoten[toID], weight);
                         // increase the allocation count
                         edgeCount[fromID]++;
                         edgeCount[toID]++;
                         // only add to the main list rn
-                        graph.Kanten.Add(kante);
+                        graph.Kanten.Add(edge);
                     }
                 }
 
                 // Now allocate the lists
-                foreach (var knoten in graph.Knoten)
+                foreach (var node in graph.Knoten)
                 {
-                    knoten.Kanten = new(edgeCount[knoten.ID]);
+                    node.Kanten = new(edgeCount[node.ID]);
                 }
 
                 // then add the edge reference to the nodes
-                foreach (var kante in graph.Kanten)
+                foreach (var edge in graph.Kanten)
                 {
-                    kante.AddReference();
+                    edge.AddReference();
                 }
 
                 return graph;
@@ -176,25 +176,25 @@ namespace Graphen
             return new Graph(0);
         }
 
-        public void AddKante(Kante kante)
+        public void AddKante(Kante edge)
         {
-            Kanten.Add(kante);
+            Kanten.Add(edge);
             // add references to this edge
-            kante.AddReference();
+            edge.AddReference();
         }
 
         public override string ToString()
         {
             var ret = $"#Knoten: {KnotenAnzahl.ToString("#,##0")}, #Kanten {KantenAnzahl.ToString("#,##0")}";
             ret += "\nKnoten:";
-            foreach (var knoten in Knoten)
+            foreach (var node in Knoten)
             {
-                ret += $"\n- {knoten}";
+                ret += $"\n- {node}";
             }
             ret += "\nKanten:";
-            foreach (var kante in Kanten)
+            foreach (var edge in Kanten)
             {
-                ret += $"\n- {kante}";
+                ret += $"\n- {edge}";
             }
             return ret;
         }
@@ -205,7 +205,7 @@ namespace Graphen
         public int ID;
         public List<Kante> Kanten;
 
-        public Knoten(int id)
+        internal Knoten(int id)
         {
             ID = id;
         }
@@ -224,9 +224,9 @@ namespace Graphen
         public static bool operator !=(Knoten a, Knoten b)
             => a.ID != b.ID;
 
-        public void AddKante(Kante kante)
+        public void AddKante(Kante edge)
         {
-            Kanten.Add(kante);
+            Kanten.Add(edge);
         }
 
         // Returns the edge between this and the given node or null if it doesn't exist
@@ -246,19 +246,19 @@ namespace Graphen
         public override string ToString()
         {
             var ret = $"ID: {ID}, #Kanten: {KantenAnzahl}";
-            foreach (var kante in Kanten)
+            foreach (var node in Kanten)
             {
-                ret += $" ({ID}->{(kante.Start.ID == ID ? kante.Ende.ID : kante.Start.ID)})";
+                ret += $" ({ID}->{(node.Start.ID == ID ? node.Ende.ID : node.Start.ID)})";
             }
             return ret;
         }
 
         public override bool Equals(object? obj)
         {
-            if (obj is not Knoten knoten)
+            if (obj is not Knoten node)
                 return false;
 
-            return ID == knoten.ID;
+            return ID == node.ID;
         }
     }
 
@@ -269,10 +269,10 @@ namespace Graphen
         public double? Weight;
         //TODO: add direction if we need it
 
-        public Kante(Knoten start, Knoten ende, double? weight = null)
+        public Kante(Knoten start, Knoten end, double? weight = null)
         {
             Start = start;
-            Ende = ende;
+            Ende = end;
             Weight = weight;
         }
 
