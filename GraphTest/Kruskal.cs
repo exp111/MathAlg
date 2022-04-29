@@ -72,11 +72,7 @@ namespace GraphTest
                 Console.WriteLine($"Read {fileName} ({graph.KnotenAnzahl} Knoten, {graph.KantenAnzahl} Kanten)");
                 var readTime = stopwatch.Elapsed;
                 var mst = graph.Kruskal();
-                var count = 0d;
-                foreach (var k in mst.Kanten)
-                {
-                    count += k.Weight!.Value;
-                }
+                var count = mst.Kanten.GetWeight();
                 Console.WriteLine($"Kruskal: {count}");
                 stopwatch.Stop();
                 var time = stopwatch.Elapsed;

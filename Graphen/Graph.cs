@@ -229,6 +229,20 @@ namespace Graphen
             Kanten.Add(kante);
         }
 
+        // Returns the edge between this and the given node or null if it doesn't exist
+        public Kante? GetEdge(Knoten node)
+        {
+            foreach (var edge in Kanten)
+            {
+                if (edge.Other(this) == node)
+                {
+                    return edge;
+                }
+            }
+
+            return null;
+        }
+
         public override string ToString()
         {
             var ret = $"ID: {ID}, #Kanten: {KantenAnzahl}";
@@ -277,7 +291,36 @@ namespace Graphen
 
         public override string ToString()
         {
-            return $"From: {Start.ID}, To: {Ende.ID}";
+            if (Weight.HasValue)
+                return $"From: {Start.ID}, To: {Ende.ID}, Weight: {Weight}";
+            else
+                return $"From: {Start.ID}, To: {Ende.ID}";
+        }
+    }
+
+    public static class KantenListExtension
+    {
+        public static double GetWeight(this List<Kante> edges)
+        {
+            var weight = 0d;
+            foreach (var edge in edges)
+            {
+                weight += edge.Weight!.Value;
+            }
+            return weight;
+        }
+
+        public static string GetPath(this List<Kante> edges)
+        {
+            var cur = edges[0].Start;
+            var path = cur.ID.ToString();
+            foreach (var edge in edges)
+            {
+                var other = edge.Other(cur);
+                path += $"->{other.ID}";
+                cur = other;
+            }
+            return path;
         }
     }
 }
