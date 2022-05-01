@@ -7,21 +7,21 @@ using Graphen;
 public class BenchmarkSmall
 {
     private static readonly string path = @"E:\D\Visual Studio\Uni\MathAlg\Graphen\data\";
-    private static readonly string fileName = "K_10e.txt";
+    private static readonly string fileName = "K_12.txt";
     private static readonly string file = Path.Combine(path, fileName);
 
     [Benchmark(Baseline = true)]
     public List<Kante> BenchmarkBase()
     {
         var graph = Graph.FromTextFileWeighted(file);
-        return graph.BruteForceTSP();
+        return graph.BranchBoundTSP();
     }
 
     [Benchmark]
     public List<Kante> BenchmarkB()
     {
         var graph = Graph.FromTextFileWeighted(file);
-        return graph.BruteForceTSPB();
+        return graph.BranchBoundTSPB();
     }
 }
 
