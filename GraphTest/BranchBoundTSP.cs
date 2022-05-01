@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace GraphTest
 {
-    internal class BranchBoundTSP
+    internal class BruteForceTSP
     {
         [SetUp]
         public void Setup()
@@ -22,30 +22,30 @@ namespace GraphTest
         [Test]
         public void TestGraph10()
         {
-            Assert.AreEqual("38.41", BranchBoundTest("K_10").ToString("0.00", CultureInfo.InvariantCulture));
+            Assert.AreEqual("38.41", BruteForceTest("K_10").ToString("0.00", CultureInfo.InvariantCulture));
         }
 
         [Test]
         public void TestGraph10e()
         {
-            Assert.AreEqual("27.26", BranchBoundTest("K_10e").ToString("0.00", CultureInfo.InvariantCulture));
+            Assert.AreEqual("27.26", BruteForceTest("K_10e").ToString("0.00", CultureInfo.InvariantCulture));
         }
 
         [Test]
         public void TestGraph12()
         {
-            Assert.AreEqual("45.19", BranchBoundTest("K_12").ToString("0.00", CultureInfo.InvariantCulture));
+            Assert.AreEqual("45.19", BruteForceTest("K_12").ToString("0.00", CultureInfo.InvariantCulture));
         }
 
         [Test]
         public void TestGraph12e()
         {
-            Assert.AreEqual("36.13", BranchBoundTest("K_12e").ToString("0.00", CultureInfo.InvariantCulture));
+            Assert.AreEqual("36.13", BruteForceTest("K_12e").ToString("0.00", CultureInfo.InvariantCulture));
         }
 
         // Any more tests are unrealistic
 
-        private double BranchBoundTest(string fileName)
+        private double BruteForceTest(string fileName)
         {
             try
             {
@@ -55,7 +55,7 @@ namespace GraphTest
                 var graph = Graph.FromTextFileWeighted($"{fileName}.txt");
                 Console.WriteLine($"Read {fileName} ({graph.KnotenAnzahl} Knoten, {graph.KantenAnzahl} Kanten)");
                 var readTime = stopwatch.Elapsed;
-                var edges = graph.BranchBoundTSP();
+                var edges = graph.BruteForceTSP();
                 var weight = edges.GetWeight();
                 Console.WriteLine($"Bruteforce: {edges.GetPath()} ({weight})");
                 stopwatch.Stop();
