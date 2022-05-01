@@ -122,7 +122,7 @@ namespace Graphen
             // generates all circle tour permutations (in a complete graph) and saves the best one in bestTour
             void permute(int lvl, Knoten start, Knoten cur, double tourCost, Kante[] tour)
             {
-                // mark the current level
+                // mark the current node
                 marked[cur.ID] = true;
                 // finished this tour?
                 if (lvl == graph.KnotenAnzahl - 1)
@@ -151,6 +151,7 @@ namespace Graphen
                         permute(lvl + 1, start, other, newCost, tour);
                     }
                 }
+                // unmark the current node 
                 marked[cur.ID] = false;
             }
 

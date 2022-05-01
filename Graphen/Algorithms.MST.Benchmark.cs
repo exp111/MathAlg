@@ -8,9 +8,7 @@ namespace Graphen
 {
     public static partial class Algorithms
     {
-        //TODO: use fibonacci heap for prio queue?
-        //TODO: optimize
-        public static Graph Prim(this Graph graph)
+        public static Graph PrimB(this Graph graph)
         {
             PriorityQueue<Kante, double> queue = new();
             bool[] marked = new bool[graph.KnotenAnzahl];
@@ -54,12 +52,7 @@ namespace Graphen
             return new Graph(graph.KnotenAnzahl, edges);
         }
 
-        public class SubSet
-        {
-            public int Parent, Rank;
-        }
-        //TODO: optimize more? maybe path compression?
-        public static Graph Kruskal(this Graph graph)
+        public static Graph KruskalB(this Graph graph)
         {
             PriorityQueue<Kante, double> queue = new();
             foreach (var k in graph.Kanten)
