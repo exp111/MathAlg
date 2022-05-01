@@ -43,6 +43,10 @@ foreach (var fileName in files)
         Console.WriteLine($"DoubleTree: {edgesDouble.GetPath()} ({edgesDouble.GetWeight()})");
         var doubleTime = stopwatch.Elapsed - neighbourTime - readTime;
 
+        var bruteforce = graph.BruteForceTSP();
+        Console.WriteLine($"Bruteforce: {bruteforce.GetPath()} ({bruteforce.GetWeight()})");
+        var bruteTime = stopwatch.Elapsed - doubleTime - neighbourTime - readTime;
+
         stopwatch.Stop();
         var time = stopwatch.Elapsed;
         //Debug.Assert(weightDouble == weight);
@@ -52,6 +56,7 @@ foreach (var fileName in files)
         Console.WriteLine($"Exec Time: {(int)execTime.TotalMilliseconds} ms ({(int)execTime.TotalSeconds} seconds)");
         Console.WriteLine($"NearestNeighbour Time: {(int)neighbourTime.TotalMilliseconds} ms ({(int)neighbourTime.TotalSeconds} seconds)");
         Console.WriteLine($"DoubleTree Time: {(int)doubleTime.TotalMilliseconds} ms ({(int)doubleTime.TotalSeconds} seconds)");
+        Console.WriteLine($"BruteForce Time: {(int)bruteTime.TotalMilliseconds} ms ({(int)bruteTime.TotalSeconds} seconds)");
 #if EXPORT
         File.WriteAllLines($"out/{fileName}.graphml", graph.ExportToGraphML());
         Console.WriteLine($"Graph written to {fileName}.graphml");

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace GraphTest
 {
-    internal class NearestNeighbour
+    internal class BruteForceTSP
     {
         [SetUp]
         public void Setup()
@@ -22,64 +22,64 @@ namespace GraphTest
         [Test]
         public void TestGraph10()
         {
-            Assert.AreEqual("41.17", NearestNeighbourTest("K_10").ToString("0.00", CultureInfo.InvariantCulture));
+            Assert.AreEqual("38.41", BruteForceTest("K_10").ToString("0.00", CultureInfo.InvariantCulture));
         }
 
         [Test]
         public void TestGraph10e()
         {
-            Assert.AreEqual("32.42", NearestNeighbourTest("K_10e").ToString("0.00", CultureInfo.InvariantCulture));
+            Assert.AreEqual("27.26", BruteForceTest("K_10e").ToString("0.00", CultureInfo.InvariantCulture));
         }
 
         [Test]
         public void TestGraph12()
         {
-            Assert.AreEqual("50.43", NearestNeighbourTest("K_12").ToString("0.00", CultureInfo.InvariantCulture));
+            Assert.AreEqual("45.19", BruteForceTest("K_12").ToString("0.00", CultureInfo.InvariantCulture));
         }
 
         [Test]
         public void TestGraph12e()
         {
-            Assert.AreEqual("37.63", NearestNeighbourTest("K_12e").ToString("0.00", CultureInfo.InvariantCulture));
+            Assert.AreEqual("36.13", BruteForceTest("K_12e").ToString("0.00", CultureInfo.InvariantCulture));
         }
 
         [Test]
         public void TestGraph15()
         {
-            Assert.AreEqual("53.21", NearestNeighbourTest("K_15").ToString("0.00", CultureInfo.InvariantCulture));
+            Assert.AreEqual("70.37", BruteForceTest("K_15").ToString("0.00", CultureInfo.InvariantCulture));
         }
 
         [Test]
         public void TestGraph15e()
         {
-            Assert.AreEqual("38.16", NearestNeighbourTest("K_15e").ToString("0.00", CultureInfo.InvariantCulture));
+            Assert.AreEqual("37.48", BruteForceTest("K_15e").ToString("0.00", CultureInfo.InvariantCulture));
         }
 
         [Test]
         public void TestGraph20()
         {
-            Assert.AreEqual("74.83", NearestNeighbourTest("K_20").ToString("0.00", CultureInfo.InvariantCulture));
+            Assert.AreEqual("99.69", BruteForceTest("K_20").ToString("0.00", CultureInfo.InvariantCulture));
         }
 
         [Test]
         public void TestGraph30()
         {
-            Assert.AreEqual("105.67", NearestNeighbourTest("K_30").ToString("0.00", CultureInfo.InvariantCulture));
+            Assert.AreEqual("138.22", BruteForceTest("K_30").ToString("0.00", CultureInfo.InvariantCulture));
         }
 
         [Test]
         public void TestGraph50()
         {
-            Assert.AreEqual("171.28", NearestNeighbourTest("K_50").ToString("0.00", CultureInfo.InvariantCulture));
+            Assert.AreEqual("230.94", BruteForceTest("K_50").ToString("0.00", CultureInfo.InvariantCulture));
         }
 
         [Test]
         public void TestGraph100()
         {
-            Assert.AreEqual("323.93", NearestNeighbourTest("K_100").ToString("0.00", CultureInfo.InvariantCulture));
+            Assert.AreEqual("445.45", BruteForceTest("K_100").ToString("0.00", CultureInfo.InvariantCulture));
         }
 
-        private double NearestNeighbourTest(string fileName)
+        private double BruteForceTest(string fileName)
         {
             try
             {
@@ -89,9 +89,9 @@ namespace GraphTest
                 var graph = Graph.FromTextFileWeighted($"{fileName}.txt");
                 Console.WriteLine($"Read {fileName} ({graph.KnotenAnzahl} Knoten, {graph.KantenAnzahl} Kanten)");
                 var readTime = stopwatch.Elapsed;
-                var edges = graph.NearestNeighbour();
+                var edges = graph.BruteForceTSP();
                 var weight = edges.GetWeight();
-                Console.WriteLine($"NearestNeighbour: {edges.GetPath()} ({weight})");
+                Console.WriteLine($"Bruteforce: {edges.GetPath()} ({weight})");
                 stopwatch.Stop();
                 var time = stopwatch.Elapsed;
                 Console.WriteLine($"{fileName} took {(int)time.TotalMilliseconds} ms ({(int)time.TotalSeconds} seconds)");
@@ -102,7 +102,7 @@ namespace GraphTest
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Exception during NearestNeighbourTest: {ex}");
+                Console.WriteLine($"Exception during BruteForceTest: {ex}");
             }
             return 0;
         }

@@ -68,7 +68,6 @@ namespace GraphTest
                 Console.WriteLine($"Read Time: {(int)readTime.TotalMilliseconds} ms ({(int)readTime.TotalSeconds} seconds)");
                 var execTime = time - readTime;
                 Console.WriteLine($"Exec Time: {(int)execTime.TotalMilliseconds} ms ({(int)execTime.TotalSeconds} seconds)");
-                Console.WriteLine();
                 return count;
             }
             catch (Exception ex)

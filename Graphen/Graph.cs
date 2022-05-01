@@ -37,7 +37,7 @@ namespace Graphen
             // copy the edges over (by creating new nodes)
             foreach (var edge in edges)
             {
-                Kanten.Add(new Kante(Knoten[edge.Start.ID], Knoten[edge.Ende.ID]));
+                Kanten.Add(new Kante(Knoten[edge.Start.ID], Knoten[edge.Ende.ID], edge.Weight));
                 // increase allocation count
                 edgeCount[edge.Start.ID]++;
                 edgeCount[edge.Ende.ID]++;

@@ -117,7 +117,6 @@ namespace GraphTest
                 var time = stopwatch.Elapsed;
                 Console.WriteLine($"{fileName} took {(int)time.TotalMilliseconds} ms ({(int)time.TotalSeconds} seconds)");
                 Console.WriteLine($"Read Time: {(int)readTime.TotalMilliseconds} ms ({(int)readTime.TotalSeconds} seconds)");
-                Console.WriteLine();
             }
             catch (Exception ex)
             {
@@ -140,7 +139,6 @@ namespace GraphTest
                 var time = stopwatch.Elapsed;
                 Console.WriteLine($"{fileName} took {(int)time.TotalMilliseconds} ms ({(int)time.TotalSeconds} seconds)");
                 Console.WriteLine($"Read Time: {(int)readTime.TotalMilliseconds} ms ({(int)readTime.TotalSeconds} seconds)");
-                Console.WriteLine();
                 return graph;
             }
             catch (Exception ex)
