@@ -171,8 +171,13 @@ namespace Graphen
             var bestTourCost = double.MaxValue;
             var bestTour = new Kante[graph.KnotenAnzahl];
 
+            // we can start the tour anywhere because the resulting circle will be that same (as it's a circle)
+            var start = graph.Knoten[0];
+            var tour = new Kante[graph.KnotenAnzahl];
+            
+
             // generates all circle tour permutations (in a complete graph) and saves the best one in bestTour
-            void permute(int lvl, Knoten start, Knoten cur, double tourCost, Kante[] tour)
+            void permute(int lvl, Knoten cur, double tourCost)
             {
                 // mark the current node
                 marked[cur.ID] = true;
@@ -206,19 +211,14 @@ namespace Graphen
                         // add this edge to the tour
                         tour[lvl] = edge;
                         // then run it from the next node at a deeper level
-                        permute(lvl + 1, start, other, newCost, tour);
+                        permute(lvl + 1, other, newCost);
                     }
                 }
                 // unmark the current node (as we're going back now)
                 marked[cur.ID] = false;
             }
 
-            var tour = new Kante[graph.KnotenAnzahl];
-            // we can start the tour anywhere because the resulting circle will be that same (as it's a circle)
-            var start = graph.Knoten[0];
-            var cur = start;
-
-            permute(0, start, start, 0, tour);
+            permute(0, start, 0);
             return bestTour.ToList();
         }
     }
