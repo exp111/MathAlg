@@ -73,3 +73,8 @@ foreach (var fileName in files)
         Console.WriteLine($"Exception during Main: {ex}");
     }
 }
+
+{
+    var graph = Graph.FromTextFileDirectedWeighted("G_D_4_4.txt");
+    graph.BellmanFord();
+}

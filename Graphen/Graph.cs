@@ -37,10 +37,11 @@ namespace Graphen
             // copy the edges over (by creating new nodes)
             foreach (var edge in edges)
             {
-                Kanten.Add(new Kante(Knoten[edge.Start.ID], Knoten[edge.Ende.ID], edge.Weight));
+                Kanten.Add(new Kante(Knoten[edge.Start.ID], Knoten[edge.Ende.ID], edge.Weight, edge.Directed));
                 // increase allocation count
                 edgeCount[edge.Start.ID]++;
-                edgeCount[edge.Ende.ID]++;
+                if (!edge.Directed)
+                    edgeCount[edge.Ende.ID]++;
             }
 
             // allocate the lists so we dont have to up the capacity
@@ -176,6 +177,68 @@ namespace Graphen
             return new Graph(0);
         }
 
+        public static Graph FromTextFileDirectedWeighted(string fileName)
+        {
+            try
+            {
+                Graph graph;
+                int[] edgeCount;
+                var file = File.OpenRead(fileName);
+                using (var reader = new StreamReader(file))
+                {
+                    // first line is the amount of nodes
+                    var line = reader.ReadLine()!.TrimEnd();
+                    var amount = int.Parse(line);
+                    graph = new Graph(amount);//, lines.Length - 1);
+                    // Contains the edgecount for each node, so we can allocate them in one batch instead of needing to resize
+                    edgeCount = new int[amount];
+                    // rest of the lines are the edges in the format "fromID    toID    weight"
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        // split by \t, essentially equal to line.Split("\t");
+                        var span = line.AsSpan();
+                        var index = span.IndexOf("\t");
+                        var first = span[..index];
+                        span = span[(index + 1)..]; // move string forward to ignore first \t
+                        var secondIndex = span.IndexOf("\t");
+                        var second = span[..secondIndex];
+                        var third = span[(secondIndex + 1)..];
+                        // parse them into ints
+                        var fromID = int.Parse(first);
+                        var toID = int.Parse(second); // trim \r\n from the right side
+                        var weight = double.Parse(third.TrimEnd(), NumberStyles.Float, CultureInfo.InvariantCulture);
+                        // put the edge into the graph
+                        var edge = new Kante(graph.Knoten[fromID], graph.Knoten[toID], weight, true);
+                        // increase the allocation count
+                        edgeCount[fromID]++;
+                        edgeCount[toID]++;
+                        // only add to the main list rn
+                        graph.Kanten.Add(edge);
+                    }
+                }
+
+                // Now allocate the lists
+                foreach (var node in graph.Knoten)
+                {
+                    node.Kanten = new(edgeCount[node.ID]);
+                }
+
+                // then add the edge reference to the nodes
+                foreach (var edge in graph.Kanten)
+                {
+                    edge.AddReference();
+                }
+
+                return graph;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception during Graph.FromTextFileWeighted: {ex}");
+            }
+
+            return new Graph(0);
+        }
+
         public void AddKante(Kante edge)
         {
             Kanten.Add(edge);
@@ -267,20 +330,23 @@ namespace Graphen
         public Knoten Start;
         public Knoten Ende;
         public double? Weight;
+        public bool Directed;
         //TODO: add direction if we need it
 
-        public Kante(Knoten start, Knoten end, double? weight = null)
+        public Kante(Knoten start, Knoten end, double? weight = null, bool directed = false)
         {
             Start = start;
             Ende = end;
             Weight = weight;
+            Directed = directed;
         }
 
         // Adds itself to the nodes
         public void AddReference()
         {
             Start.Kanten.Add(this);
-            Ende.Kanten.Add(this); //TODO: dont add if directed
+            if (!Directed) //TODO: dont add backreference if directed
+                Ende.Kanten.Add(this);
         }
 
         // Given a node that touches the edge, returns the node on the other side. Not defined if the node doesnt touch this edge
@@ -292,9 +358,9 @@ namespace Graphen
         public override string ToString()
         {
             if (Weight.HasValue)
-                return $"From: {Start.ID}, To: {Ende.ID}, Weight: {Weight}";
+                return $"From: {Start.ID}, To: {Ende.ID}, Weight: {Weight}, Directed: {Directed}";
             else
-                return $"From: {Start.ID}, To: {Ende.ID}";
+                return $"From: {Start.ID}, To: {Ende.ID}, Directed: {Directed}";
         }
     }
 
