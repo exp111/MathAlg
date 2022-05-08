@@ -86,7 +86,7 @@ namespace GraphTest
                 var stopwatch = new Stopwatch();
                 stopwatch.Start();
                 Console.WriteLine($"Reading {fileName}");
-                var graph = Graph.FromTextFileWeighted($"{fileName}.txt");
+                var graph = Graph.FromTextFile($"{fileName}.txt");
                 Console.WriteLine($"Read {fileName} ({graph.KnotenAnzahl} Knoten, {graph.KantenAnzahl} Kanten)");
                 var readTime = stopwatch.Elapsed;
                 var edges = graph.DoubleTree();

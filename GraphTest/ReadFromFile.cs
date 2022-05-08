@@ -3,6 +3,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -57,7 +58,7 @@ namespace GraphTest
         [Test]
         public void TestGraph1k2k()
         {
-            var graph = ReadFromFileWeightedTest("G_1_2", 1000, 2000);
+            var graph = ReadFromFileWeightedTest("G_1_2", 1000, 2000, 1013.94);
             Assert.IsTrue(graph.KantenAnzahl > 0); // so we didnt get a null graph
             var first = graph.Kanten.First();
             Assert.IsNotNull(first);
@@ -75,31 +76,31 @@ namespace GraphTest
         [Test]
         public void TestGraph1k20k()
         {
-            ReadFromFileWeightedTest("G_1_20", 1000, 20000);
+            ReadFromFileWeightedTest("G_1_20", 1000, 20000, 10062.66);
         }
 
         [Test]
         public void TestGraph1k200k()
         {
-            ReadFromFileWeightedTest("G_1_200", 1000, 200000);
+            ReadFromFileWeightedTest("G_1_200", 1000, 200000, 100230.43);
         }
 
         [Test]
         public void TestGraph10k20k()
         {
-            ReadFromFileWeightedTest("G_10_20", 10000, 20000);
+            ReadFromFileWeightedTest("G_10_20", 10000, 20000, 10070.33);
         }
 
         [Test]
         public void TestGraph10k200k()
         {
-            ReadFromFileWeightedTest("G_10_200", 10000, 200000);
+            ReadFromFileWeightedTest("G_10_200", 10000, 200000, 100276.18);
         }
 
         [Test]
         public void TestGraph100k200k()
         {
-            ReadFromFileWeightedTest("G_100_200", 100000, 200000);
+            ReadFromFileWeightedTest("G_100_200", 100000, 200000, 100134.53);
         }
 
         private void ReadFromFileTest(string fileName, int nodes, int edges)
@@ -124,17 +125,24 @@ namespace GraphTest
             }
         }
 
-        private Graph ReadFromFileWeightedTest(string fileName, int nodes, int edges)
+        private Graph ReadFromFileWeightedTest(string fileName, int nodes, int edges, double weight)
         {
             try
             {
                 var stopwatch = new Stopwatch();
                 stopwatch.Start();
                 Console.WriteLine($"Reading {fileName}");
-                var graph = Graph.FromTextFileWeighted($"{fileName}.txt");
+                var graph = Graph.FromTextFile($"{fileName}.txt");
                 Console.WriteLine($"Read {fileName} ({graph.KnotenAnzahl} Knoten, {graph.KantenAnzahl} Kanten)");
                 Assert.AreEqual(nodes, graph.KnotenAnzahl);
                 Assert.AreEqual(edges, graph.KantenAnzahl);
+                var edgeWeight = 0d;
+                foreach (var edge in graph.Kanten)
+                {
+                    edgeWeight += edge.Weight!.Value;
+                }
+                Assert.AreEqual(weight.ToString("0.00", CultureInfo.InvariantCulture), weight.ToString("0.00", CultureInfo.InvariantCulture));
+
                 var readTime = stopwatch.Elapsed;
                 var time = stopwatch.Elapsed;
                 Console.WriteLine($"{fileName} took {(int)time.TotalMilliseconds} ms ({(int)time.TotalSeconds} seconds)");

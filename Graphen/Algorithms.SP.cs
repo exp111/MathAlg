@@ -8,7 +8,7 @@ namespace Graphen
 {
     public static partial class Algorithms
     {
-        public static List<Kante> Dijkstra(this Graph graph, int startID, int endID)
+        public static List<Kante> Dijkstra(this Graph graph, int startID, int endID) //TODO: rather return a shortest path tree? then we wouldnt need a endID
         {
             List<Knoten> queue = new();
             var dist = new double[graph.KnotenAnzahl];
@@ -17,6 +17,7 @@ namespace Graphen
             dist[start.ID] = 0;
             queue.Add(start);
             var pred = new int[graph.KnotenAnzahl];
+            Array.Fill(pred, -1); // pred = NULL // TODO: maybe do null instead?
             pred[start.ID] = start.ID;
             while (queue.Count > 0)
             {
@@ -43,13 +44,15 @@ namespace Graphen
             return new();
         }
 
-        public static bool BellmanFord(this Graph graph)
+        // returns the shortest way graph and if the graph contains a negative cycle
+        public static (Graph, bool) BellmanFord(this Graph graph, int startID = 0)
         {
-            var start = graph.Knoten[0];
+            var start = graph.Knoten[startID];
             var dist = new double[graph.KnotenAnzahl];
             Array.Fill(dist, double.MaxValue); // dist = infinite //TODO: maybe null it instead?
             dist[start.ID] = 0;
             var pred = new int[graph.KnotenAnzahl];
+            Array.Fill(pred, -1); // pred = NULL // TODO: maybe do null instead?
             pred[start.ID] = start.ID;
 
             // repeat n times
@@ -73,7 +76,10 @@ namespace Graphen
 
 
             //TODO: return graph
-            return false;
+            // what should we return here?
+            // the graph, but then the shortest path search would be more inefficient.
+            // or the pred list? but that would then require a getEdge again.
+            return (new(0), false);
         }
     }
 }

@@ -13,14 +13,14 @@ public class BenchmarkSmall
     [Benchmark(Baseline = true)]
     public List<Kante> BenchmarkBase()
     {
-        var graph = Graph.FromTextFileWeighted(file);
+        var graph = Graph.FromTextFile(file);
         return graph.BranchBoundTSP();
     }
 
     [Benchmark]
     public List<Kante> BenchmarkB()
     {
-        var graph = Graph.FromTextFileWeighted(file);
+        var graph = Graph.FromTextFile(file);
         return graph.BranchBoundTSPB();
     }
 }
@@ -37,14 +37,14 @@ public class BenchmarkMedium
     [Benchmark(Baseline = true)]
     public Graph BenchmarkBase()
     {
-        var graph = Graph.FromTextFileWeighted(file);
+        var graph = Graph.FromTextFile(file);
         return graph.Prim();
     }
 
     [Benchmark]
     public Graph BenchmarkB()
     {
-        var graph = Graph.FromTextFileWeighted(file);
+        var graph = Graph.FromTextFile(file);
         return graph.PrimB();
     }
 }
@@ -61,14 +61,14 @@ public class BenchmarkBig
     [Benchmark(Baseline = true)]
     public Graph BenchmarkBase()
     {
-        var graph = Graph.FromTextFileWeighted(file);
+        var graph = Graph.FromTextFile(file);
         return graph.Prim();
     }
 
     [Benchmark]
     public Graph BenchmarkB()
     {
-        var graph = Graph.FromTextFileWeighted(file);
+        var graph = Graph.FromTextFile(file);
         return graph.PrimB();
     }
 }
