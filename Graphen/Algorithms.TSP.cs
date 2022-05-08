@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,13 +9,13 @@ namespace Graphen
 {
     public static partial class Algorithms
     {
-        public static List<Kante> NearestNeighbour(this Graph graph)
+        public static List<Kante> NearestNeighbour(this Graph graph, int startID = 0)
         {
             List<Kante> edges = new();
             bool[] marked = new bool[graph.KnotenAnzahl];
 
-            // select random node and mark it
-            var start = graph.Knoten[0];
+            // select start/random node (defaults to 0) and mark it
+            var start = graph.Knoten[startID];
             var cur = start;
             marked[cur.ID] = true;
             // while not every node was searched (as we have a complete graph this means that
@@ -54,13 +55,14 @@ namespace Graphen
                 }
             }
             // add edge from cur (last node) to start at the end
-            //TODO: null handling mayhaps?
-            edges.Add(cur.GetEdge(start)!);
+            var e = cur.GetEdge(start)!;
+            Debug.Assert(e != null);
+            edges.Add(e);
 
             return edges;
         }
 
-        public static List<Kante> DoubleTree(this Graph graph)
+        public static List<Kante> DoubleTree(this Graph graph, int startID = 0)
         {
             // first generate the mst
             var mst = graph.Prim();
@@ -70,7 +72,7 @@ namespace Graphen
             List<int> nodeIDs = new(mst.KnotenAnzahl); // NOTE: we collect the IDs because we search on the mst but connect later on the full graph
             Stack<Knoten> queue = new();
 
-            var start = mst.Knoten[0];
+            var start = mst.Knoten[startID];
             queue.Push(start);
             nodeIDs.Add(start.ID);
             // mark the start first (because we added it)
@@ -100,13 +102,17 @@ namespace Graphen
             {
                 var cur = graph.Knoten[nodeIDs[i]];
                 var next = graph.Knoten[nodeIDs[i + 1]];
-                //TODO: null handling mayhaps?
-                edges.Add(cur.GetEdge(next)!);
+                // get the edge between the nodes
+                var edge = cur.GetEdge(next)!;
+                Debug.Assert(edge != null);
+                edges.Add(edge);
             }
             // also add edge back from the last to the first
             var first = graph.Knoten[nodeIDs[0]];
             var last = graph.Knoten[nodeIDs[nodeIDs.Count - 1]];
-            edges.Add(last.GetEdge(first)!); //TODO: null handling :weary:
+            var e = last.GetEdge(first)!;
+            Debug.Assert(e != null);
+            edges.Add(e);
 
             return edges;
         }
@@ -126,6 +132,7 @@ namespace Graphen
                 if (lvl == graph.KnotenAnzahl - 1)
                 {
                     var returnEdge = cur.GetEdge(start)!;
+                    Debug.Assert(returnEdge != null);
                     var newCost = tourCost + returnEdge.Weight!.Value;
                     // check if the cost is lower than the previous routes => save
                     if (newCost < bestTourCost)
@@ -179,6 +186,7 @@ namespace Graphen
                 if (lvl == graph.KnotenAnzahl - 1)
                 {
                     var returnEdge = cur.GetEdge(start)!;
+                    Debug.Assert(returnEdge != null);
                     var newCost = tourCost + returnEdge.Weight!.Value;
                     // check if the cost is lower than the previous routes => save
                     if (newCost < bestTourCost)
