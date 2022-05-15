@@ -8,7 +8,7 @@ namespace Graphen
 {
     public static partial class Algorithms
     {
-        public static List<Kante> Dijkstra(this Graph graph, int startID, int endID) //TODO: rather return a shortest path tree? then we wouldnt need a endID
+        public static List<Kante> Dijkstra(this Graph graph, int startID)
         {
             List<Knoten> queue = new();
             var dist = new double[graph.KnotenAnzahl];
@@ -41,7 +41,7 @@ namespace Graphen
                 }
             }
 
-            //TODO: return graph
+            //TODO: return graph/shortest path tree/predecessor arr
             return new();
         }
 
@@ -83,6 +83,8 @@ namespace Graphen
             // what should we return here?
             // the graph, but then the shortest path search would be more inefficient.
             // or the pred list? but that would then require a getEdge again.
+
+            //TODO: return a "handle to the cycle"; meaning the edge where we found it?
             return (new(0), false);
         }
     }
