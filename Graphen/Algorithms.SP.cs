@@ -67,18 +67,22 @@ namespace Graphen
         {
             var dist = new double[graph.KnotenAnzahl];
             var pred = new int[graph.KnotenAnzahl];
-            Array.Fill(dist, double.PositiveInfinity); // dist = infinite //TODO: maybe null it instead?
+            Array.Fill(dist, double.PositiveInfinity); // dist = infinite
             Array.Fill(pred, Knoten.InvalidID); // pred = NULL
 
             var start = graph.Knoten[startID];
             dist[start.ID] = 0;
             pred[start.ID] = start.ID;
 
+            var changed = true;
             // repeat n - 1 times
             for (var i = 0; i < graph.KnotenAnzahl - 1; i++)
             {
-                //TODO: if (!changed) break
-                //TODO: changed = false;
+                // check if we changed anything last iteration
+                if (!changed)
+                    break; // if not no need to run any longer
+
+                changed = false;
                 foreach (var edge in graph.Kanten)
                 {
                     var v = edge.Start.ID;
@@ -89,7 +93,7 @@ namespace Graphen
                     {
                         dist[w] = newCost;
                         pred[w] = v;
-                        //TODO: changed = true;
+                        changed = true;
                     }
 
                     // if its undirected, also check the other side
