@@ -5,24 +5,24 @@ using System.Diagnostics;
 
 Directory.SetCurrentDirectory(@"E:\D\Visual Studio\Uni\MathAlg\Graphen\data");
 var files = new List<string>();
-//files.Add("G_1_2");
-//files.Add("G_15_18");
-//files.Add("G_1_20");
-//files.Add("G_1_200");
-//files.Add("G_10_20");
-//files.Add("G_10_200");
-//files.Add("G_100_200");
+//files.Add(@"weighted\G_1_2");
+//files.Add(@"weighted\G_15_18");
+//files.Add(@"weighted\G_1_20");
+//files.Add(@"weighted\G_1_200");
+//files.Add(@"weighted\G_10_20");
+//files.Add(@"weighted\G_10_200");
+//files.Add(@"weighted\G_100_200");
 
-files.Add("K_10");
-//files.Add("K_10e");
-//files.Add("K_12");
-//files.Add("K_12e");
-//files.Add("K_15");
-//files.Add("K_15e");
-//files.Add("K_20");
-//files.Add("K_30");
-//files.Add("K_50");
-//files.Add("K_100");
+files.Add(@"complete\K_10");
+//files.Add(@"complete\K_10e");
+//files.Add(@"complete\K_12");
+//files.Add(@"complete\K_12e");
+//files.Add(@"complete\K_15");
+//files.Add(@"complete\K_15e");
+//files.Add(@"complete\K_20");
+//files.Add(@"complete\K_30");
+//files.Add(@"complete\K_50");
+//files.Add(@"complete\K_100");
 
 foreach (var fileName in files)
 {
@@ -75,8 +75,33 @@ foreach (var fileName in files)
 }
 
 {
-    var graph = Graph.FromTextFileDirected("G_D_4_4.txt");
+    var graph = Graph.FromTextFile(@"weighted\G_1_2.txt", false);
+    foreach (var edge in graph.Kanten)
+    {
+        var start = edge.Start;
+        var end = edge.Ende;
+        var found = false;
+        foreach (var e in start.Kanten)
+        {
+            if (e == edge)
+                found = true;
+        }
+
+        if (!found)
+            throw new Exception("not undirected start");
+
+        found = false;
+        foreach (var e in end.Kanten)
+        {
+            if (e == edge)
+                found = true;
+        }
+
+        if (!found)
+            throw new Exception("not undirected end");
+    }
+    File.WriteAllLines("out/G_1_2.graphml", graph.ExportToGraphML());
     graph.BellmanFord();
-    //var graph = Graph.FromTextFileDirectedWeighted("G_D_4_4_cycle.txt");
+    //var graph = Graph.FromTextFile("G_D_4_4_cycle.txt", true);
     //graph.Dijkstra(0, 3);
 }

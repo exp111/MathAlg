@@ -132,7 +132,7 @@ namespace GraphTest
                 var stopwatch = new Stopwatch();
                 stopwatch.Start();
                 Console.WriteLine($"Reading {fileName}");
-                var graph = Graph.FromTextFile(@$"weighted\{fileName}.txt");
+                var graph = Graph.FromTextFile(@$"weighted\{fileName}.txt", true);
                 Console.WriteLine($"Read {fileName} ({graph.KnotenAnzahl} Knoten, {graph.KantenAnzahl} Kanten)");
                 Assert.AreEqual(nodes, graph.KnotenAnzahl);
                 Assert.AreEqual(edges, graph.KantenAnzahl);

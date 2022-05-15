@@ -57,7 +57,7 @@ namespace Graphen
             }
         }
 
-        public static Graph FromTextFile(string fileName)
+        public static Graph FromTextFile(string fileName, bool directed = false)
         {
             try
             {
@@ -72,7 +72,7 @@ namespace Graphen
                     graph = new Graph(amount);//, lines.Length - 1);
                     // Contains the edgecount for each node, so we can allocate them in one batch instead of needing to resize
                     edgeCount = new int[amount];
-                    // rest of the lines are the edges in the format "fromID    toID"
+                    // rest of the lines are the edges in the format "fromID    toID    weight" (weight being optional)
                     while ((line = reader.ReadLine()) != null)
                     {
                         // split by \t, essentially equal to line.Split("\t");
@@ -94,75 +94,7 @@ namespace Graphen
                         var fromID = int.Parse(first);
                         var toID = int.Parse(second); // trim \r\n from the right side
                         // put the edge into the graph
-                        var edge = new Kante(graph.Knoten[fromID], graph.Knoten[toID], weight);
-                        // increase the allocation count
-                        edgeCount[fromID]++;
-                        edgeCount[toID]++;
-                        // only add to the main list rn
-                        graph.Kanten.Add(edge);
-                    }
-                }
-
-                // Now allocate the lists
-                foreach (var node in graph.Knoten)
-                {
-                    node.Kanten = new(edgeCount[node.ID]);
-                }
-
-                // then add the edge reference to the nodes
-                foreach (var edge in graph.Kanten)
-                {
-                    edge.AddReference();
-                }
-
-                return graph;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Exception during Graph.FromTextFile: {ex}");
-            }
-
-            return new Graph(0);
-        }
-
-        public static Graph FromTextFileDirected(string fileName)
-        {
-            try
-            {
-                Graph graph;
-                int[] edgeCount;
-                var file = File.OpenRead(fileName);
-                using (var reader = new StreamReader(file))
-                {
-                    // first line is the amount of nodes
-                    var line = reader.ReadLine()!.TrimEnd();
-                    var amount = int.Parse(line);
-                    graph = new Graph(amount);//, lines.Length - 1);
-                    // Contains the edgecount for each node, so we can allocate them in one batch instead of needing to resize
-                    edgeCount = new int[amount];
-                    // rest of the lines are the edges in the format "fromID    toID    weight"
-                    while ((line = reader.ReadLine()) != null)
-                    {
-                        // split by \t, essentially equal to line.Split("\t");
-                        var span = line.AsSpan();
-                        var index = span.IndexOf("\t");
-                        var first = span[..index];
-                        span = span[(index + 1)..]; // move string forward to ignore first \t
-                        var secondIndex = span.IndexOf("\t");
-                        ReadOnlySpan<char> second = span;
-                        double? weight = null;
-                        if (secondIndex != -1) // found another \t => line got weight
-                        {
-                            second = span[..secondIndex];
-                            var third = span[(secondIndex + 1)..];
-                            weight = double.Parse(third.TrimEnd(), NumberStyles.Float, CultureInfo.InvariantCulture);
-                        }
-
-                        // parse them into ints
-                        var fromID = int.Parse(first);
-                        var toID = int.Parse(second); // trim \r\n from the right side
-                        // put the edge into the graph
-                        var edge = new Kante(graph.Knoten[fromID], graph.Knoten[toID], weight, true);
+                        var edge = new Kante(graph.Knoten[fromID], graph.Knoten[toID], weight, directed);
                         // increase the allocation count
                         edgeCount[fromID]++;
                         edgeCount[toID]++;
@@ -200,18 +132,11 @@ namespace Graphen
             edge.AddReference();
         }
 
-        // Returns a list of edges when given a predecessor array
-        public List<Kante> GetPath(int[] pred)
+        public Kante? GetEdge(int startID, int endID)
         {
-            //TODO: do we need the return edge?
-            List<Kante> path = new(KnotenAnzahl - 1); // max N - 1 edges for a path //TODO: rather prealloc more? or dynamically alloc
-            /*int[] next = new int[KnotenAnzahl];
-            for (var i = 0; i < pred.Length; i++)
-            {
-                next[pred[i]] = i;
-            }*/
-
-            return path;
+            var start = Knoten[startID];
+            var end = Knoten[endID];
+            return start.GetEdge(end);
         }
 
         public override string ToString()
@@ -291,6 +216,8 @@ namespace Graphen
 
             return ID == node.ID;
         }
+
+        public static readonly int InvalidID = -1; //TODO: maybe do null or NaN?
     }
 
     public class Kante
@@ -299,7 +226,6 @@ namespace Graphen
         public Knoten Ende;
         public double? Weight;
         public bool Directed;
-        //TODO: add direction if we need it
 
         public Kante(Knoten start, Knoten end, double? weight = null, bool directed = false)
         {
@@ -313,7 +239,7 @@ namespace Graphen
         public void AddReference()
         {
             Start.Kanten.Add(this);
-            if (!Directed) //TODO: dont add backreference if directed
+            if (!Directed)
                 Ende.Kanten.Add(this);
         }
 
@@ -355,6 +281,42 @@ namespace Graphen
                 cur = other;
             }
             return path;
+        }
+    }
+
+    public class ShortestPathTree
+    {
+        public Graph Graph;
+        public double[] Dist;
+        public int[] Pred;
+
+        public ShortestPathTree(Graph graph, double[] dist, int[] pred)
+        {
+            Graph = graph;
+            Dist = dist;
+            Pred = pred;
+        }
+
+        public List<Kante>? GetShortestPath(int endID)
+        {
+            List<Kante> queue = new();
+            var cur = endID;
+            int next = Pred[cur];
+            while (cur != next)
+            {
+                if (next == Knoten.InvalidID)
+                    return null;
+
+                queue.Add(Graph.GetEdge(next, cur)!);
+                cur = next;
+                next = Pred[cur];
+            }
+            return queue;
+        }
+
+        public double GetShortestPathWeight(int endID)
+        {
+            return Dist[endID];
         }
     }
 }
