@@ -125,7 +125,7 @@ namespace Graphen
             return new Graph(0);
         }
 
-        public static Graph FromTextFileDirectedWeighted(string fileName)
+        public static Graph FromTextFileDirected(string fileName)
         {
             try
             {
@@ -149,12 +149,18 @@ namespace Graphen
                         var first = span[..index];
                         span = span[(index + 1)..]; // move string forward to ignore first \t
                         var secondIndex = span.IndexOf("\t");
-                        var second = span[..secondIndex];
-                        var third = span[(secondIndex + 1)..];
+                        ReadOnlySpan<char> second = span;
+                        double? weight = null;
+                        if (secondIndex != -1) // found another \t => line got weight
+                        {
+                            second = span[..secondIndex];
+                            var third = span[(secondIndex + 1)..];
+                            weight = double.Parse(third.TrimEnd(), NumberStyles.Float, CultureInfo.InvariantCulture);
+                        }
+
                         // parse them into ints
                         var fromID = int.Parse(first);
                         var toID = int.Parse(second); // trim \r\n from the right side
-                        var weight = double.Parse(third.TrimEnd(), NumberStyles.Float, CultureInfo.InvariantCulture);
                         // put the edge into the graph
                         var edge = new Kante(graph.Knoten[fromID], graph.Knoten[toID], weight, true);
                         // increase the allocation count

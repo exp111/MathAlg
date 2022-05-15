@@ -56,7 +56,7 @@ namespace GraphTest
         }
 
         [Test]
-        public void TestGraph1k2k()
+        public void TestWeightedGraph1k2k()
         {
             var graph = ReadFromFileWeightedTest("G_1_2", 1000, 2000, 1013.94);
             Assert.IsTrue(graph.KantenAnzahl > 0); // so we didnt get a null graph
@@ -74,31 +74,31 @@ namespace GraphTest
         }
 
         [Test]
-        public void TestGraph1k20k()
+        public void TestWeightedGraph1k20k()
         {
             ReadFromFileWeightedTest("G_1_20", 1000, 20000, 10062.66);
         }
 
         [Test]
-        public void TestGraph1k200k()
+        public void TestWeightedGraph1k200k()
         {
             ReadFromFileWeightedTest("G_1_200", 1000, 200000, 100230.43);
         }
 
         [Test]
-        public void TestGraph10k20k()
+        public void TestWeightedGraph10k20k()
         {
             ReadFromFileWeightedTest("G_10_20", 10000, 20000, 10070.33);
         }
 
         [Test]
-        public void TestGraph10k200k()
+        public void TestWeightedGraph10k200k()
         {
             ReadFromFileWeightedTest("G_10_200", 10000, 200000, 100276.18);
         }
 
         [Test]
-        public void TestGraph100k200k()
+        public void TestWeightedGraph100k200k()
         {
             ReadFromFileWeightedTest("G_100_200", 100000, 200000, 100134.53);
         }
@@ -110,7 +110,7 @@ namespace GraphTest
                 var stopwatch = new Stopwatch();
                 stopwatch.Start();
                 Console.WriteLine($"Reading {fileName}");
-                var graph = Graph.FromTextFile($"{fileName}.txt");
+                var graph = Graph.FromTextFile(@$"graph\{fileName}.txt");
                 Console.WriteLine($"Read {fileName} ({graph.KnotenAnzahl} Knoten, {graph.KantenAnzahl} Kanten)");
                 Assert.AreEqual(nodes, graph.KnotenAnzahl);
                 Assert.AreEqual(edges, graph.KantenAnzahl);
@@ -132,7 +132,7 @@ namespace GraphTest
                 var stopwatch = new Stopwatch();
                 stopwatch.Start();
                 Console.WriteLine($"Reading {fileName}");
-                var graph = Graph.FromTextFile($"{fileName}.txt");
+                var graph = Graph.FromTextFile(@$"weighted\{fileName}.txt");
                 Console.WriteLine($"Read {fileName} ({graph.KnotenAnzahl} Knoten, {graph.KantenAnzahl} Kanten)");
                 Assert.AreEqual(nodes, graph.KnotenAnzahl);
                 Assert.AreEqual(edges, graph.KantenAnzahl);

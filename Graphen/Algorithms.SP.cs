@@ -12,13 +12,14 @@ namespace Graphen
         {
             List<Knoten> queue = new();
             var dist = new double[graph.KnotenAnzahl];
-            Array.Fill(dist, double.MaxValue); // dist = infinite //TODO: maybe null it instead?
+            Array.Fill(dist, double.PositiveInfinity); // dist = infinite
             var start = graph.Knoten[startID];
             dist[start.ID] = 0;
             queue.Add(start);
             var pred = new int[graph.KnotenAnzahl];
             Array.Fill(pred, -1); // pred = NULL // TODO: maybe do null instead?
             pred[start.ID] = start.ID;
+            //TODO: marked
             while (queue.Count > 0)
             {
                 queue.Sort((v, w) =>
@@ -49,15 +50,17 @@ namespace Graphen
         {
             var start = graph.Knoten[startID];
             var dist = new double[graph.KnotenAnzahl];
-            Array.Fill(dist, double.MaxValue); // dist = infinite //TODO: maybe null it instead?
+            Array.Fill(dist, double.PositiveInfinity); // dist = infinite //TODO: maybe null it instead?
             dist[start.ID] = 0;
             var pred = new int[graph.KnotenAnzahl];
             Array.Fill(pred, -1); // pred = NULL // TODO: maybe do null instead?
             pred[start.ID] = start.ID;
 
-            // repeat n times
+            // repeat n - 1 times
             for (var i = 0; i < graph.KnotenAnzahl - 1; i++)
             {
+                //TODO: if (!changed) break
+                //TODO: changed = false;
                 //Console.WriteLine($"iteration: {i + 1}");
                 foreach (var edge in graph.Kanten)
                 {
@@ -70,6 +73,7 @@ namespace Graphen
                         //Console.WriteLine($"changing {w+1} cause {dist[v]}+{c} < {dist[w]}");
                         dist[w] = newCost;
                         pred[w] = v;
+                        //TODO: changed = true;
                     }
                 }
             }

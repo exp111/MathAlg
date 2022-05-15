@@ -6,7 +6,7 @@ using Graphen;
 [RankColumn]
 public class BenchmarkSmall
 {
-    private static readonly string path = @"E:\D\Visual Studio\Uni\MathAlg\Graphen\data\";
+    private static readonly string path = @"E:\D\Visual Studio\Uni\MathAlg\Graphen\data\complete";
     private static readonly string fileName = "K_12.txt";
     private static readonly string file = Path.Combine(path, fileName);
 
@@ -30,7 +30,7 @@ public class BenchmarkSmall
 [RankColumn]
 public class BenchmarkMedium
 {
-    private static readonly string path = @"E:\D\Visual Studio\Uni\MathAlg\Graphen\data\";
+    private static readonly string path = @"E:\D\Visual Studio\Uni\MathAlg\Graphen\data\graph";
     private static readonly string fileName = "G_10_200.txt";
     private static readonly string file = Path.Combine(path, fileName);
 
@@ -54,7 +54,7 @@ public class BenchmarkMedium
 [RankColumn]
 public class BenchmarkBig
 {
-    private static readonly string path = @"E:\D\Visual Studio\Uni\MathAlg\Graphen\data\";
+    private static readonly string path = @"E:\D\Visual Studio\Uni\MathAlg\Graphen\data\graph";
     private static readonly string fileName = "G_100_200.txt";
     private static readonly string file = Path.Combine(path, fileName);
 

@@ -11,7 +11,7 @@ namespace GraphTest
         [SetUp]
         public void Setup()
         {
-            Directory.SetCurrentDirectory(@"E:\D\Visual Studio\Uni\MathAlg\Graphen\data");
+            Directory.SetCurrentDirectory(@"E:\D\Visual Studio\Uni\MathAlg\Graphen\data\graph");
         }
 
         [Test]

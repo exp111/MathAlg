@@ -75,8 +75,8 @@ foreach (var fileName in files)
 }
 
 {
-    //var graph = Graph.FromTextFileDirectedWeighted("G_D_4_4.txt");
-    //graph.BellmanFord();
-    var graph = Graph.FromTextFileDirectedWeighted("G_D_4_4_cycle.txt");
-    graph.Dijkstra(0, 3);
+    var graph = Graph.FromTextFileDirected("G_D_4_4.txt");
+    graph.BellmanFord();
+    //var graph = Graph.FromTextFileDirectedWeighted("G_D_4_4_cycle.txt");
+    //graph.Dijkstra(0, 3);
 }
