@@ -11,7 +11,7 @@ namespace Graphen
         public static List<Kante> BruteForceTSPB(this Graph graph)
         {
             var marked = new bool[graph.KnotenAnzahl];
-            var bestTourCost = double.MaxValue;
+            var bestTourCost = double.PositiveInfinity;
             var bestTour = new Kante[graph.KnotenAnzahl];
 
             // generates all circle tour permutations (in a complete graph) and saves the best one in bestTour
@@ -64,7 +64,7 @@ namespace Graphen
         public static List<Kante> BranchBoundTSPB(this Graph graph)
         {
             var marked = new bool[graph.KnotenAnzahl];
-            var bestTourCost = double.MaxValue;
+            var bestTourCost = double.PositiveInfinity;
             var bestTour = new Kante[graph.KnotenAnzahl];
 
             // generates all circle tour permutations (in a complete graph) and saves the best one in bestTour

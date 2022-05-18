@@ -23,7 +23,7 @@ namespace Graphen
             while (edges.Count < graph.KnotenAnzahl - 1)
             {
                 // choose the cheapest edge to a not marked node
-                var cheapest = double.MaxValue;
+                var cheapest = double.PositiveInfinity;
                 Kante? cheapestEdge = null;
                 foreach (var edge in cur.Kanten)
                 {
@@ -120,7 +120,7 @@ namespace Graphen
         public static List<Kante> BruteForceTSP(this Graph graph)
         {
             var marked = new bool[graph.KnotenAnzahl];
-            var bestTourCost = double.MaxValue;
+            var bestTourCost = double.PositiveInfinity;
             var bestTour = new Kante[graph.KnotenAnzahl];
 
             // generates all circle tour permutations (in a complete graph) and saves the best one in bestTour
@@ -174,7 +174,7 @@ namespace Graphen
         public static List<Kante> BranchBoundTSP(this Graph graph)
         {
             var marked = new bool[graph.KnotenAnzahl];
-            var bestTourCost = double.MaxValue;
+            var bestTourCost = double.PositiveInfinity;
             var bestTour = new Kante[graph.KnotenAnzahl];
 
             // generates all circle tour permutations (in a complete graph) and saves the best one in bestTour
