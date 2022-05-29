@@ -13,7 +13,7 @@ var files = new List<string>();
 //files.Add(@"weighted\G_10_200");
 //files.Add(@"weighted\G_100_200");
 
-files.Add(@"complete\K_10");
+//files.Add(@"complete\K_10");
 //files.Add(@"complete\K_10e");
 //files.Add(@"complete\K_12");
 //files.Add(@"complete\K_12e");
@@ -75,33 +75,15 @@ foreach (var fileName in files)
 }
 
 {
-    var graph = Graph.FromTextFile(@"weighted\G_1_2.txt", false);
-    foreach (var edge in graph.Kanten)
-    {
-        var start = edge.Start;
-        var end = edge.Ende;
-        var found = false;
-        foreach (var e in start.Kanten)
-        {
-            if (e == edge)
-                found = true;
-        }
+    var graph = Graph.FromTextFile(@"flows\Fluss.txt", true, true);
+    File.WriteAllLines("out/Fluss.graphml", graph.ExportToGraphML());
+    var a = graph.EdmondsKarp(0, 7);
+    Console.WriteLine(a);
 
-        if (!found)
-            throw new Exception("not undirected start");
-
-        found = false;
-        foreach (var e in end.Kanten)
-        {
-            if (e == edge)
-                found = true;
-        }
-
-        if (!found)
-            throw new Exception("not undirected end");
-    }
-    File.WriteAllLines("out/G_1_2.graphml", graph.ExportToGraphML());
-    graph.BellmanFord();
+    graph = Graph.FromTextFile(@"flows\debug.txt", true, true);
+    File.WriteAllLines("out/debug.graphml", graph.ExportToGraphML());
+    a = graph.EdmondsKarp(0, 4);
+    Console.WriteLine(a);
     //var graph = Graph.FromTextFile("G_D_4_4_cycle.txt", true);
     //graph.Dijkstra(0, 3);
 }

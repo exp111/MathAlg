@@ -57,7 +57,12 @@ namespace Graphen
             }
         }
 
-        public static Graph FromTextFile(string fileName, bool directed = false)
+        /* Reads a graph from a text file
+         * fileName is the relative path of the file
+         * directed indicates if the edges in the graph are directed 
+         * capacity indicates if the value is the capacity (instead of the cost)
+         */
+        public static Graph FromTextFile(string fileName, bool directed = false, bool hasCapacity = false)
         {
             try
             {
@@ -83,18 +88,23 @@ namespace Graphen
                         var secondIndex = span.IndexOf("\t");
                         ReadOnlySpan<char> second = span;
                         double? weight = null;
+                        double? capacity = null;
                         if (secondIndex != -1) // found another \t => line got weight
                         {
                             second = span[..secondIndex];
                             var third = span[(secondIndex + 1)..];
-                            weight = double.Parse(third.TrimEnd(), NumberStyles.Float, CultureInfo.InvariantCulture);
+                            var value = double.Parse(third.TrimEnd(), NumberStyles.Float, CultureInfo.InvariantCulture);
+                            if (hasCapacity)
+                                capacity = value;
+                            else
+                                weight = value;
                         }
                         
                         // parse them into ints
                         var fromID = int.Parse(first);
                         var toID = int.Parse(second); // trim \r\n from the right side
                         // put the edge into the graph
-                        var edge = new Kante(graph.Knoten[fromID], graph.Knoten[toID], weight, directed);
+                        var edge = new Kante(graph.Knoten[fromID], graph.Knoten[toID], weight, capacity, directed);
                         // increase the allocation count
                         edgeCount[fromID]++;
                         edgeCount[toID]++;
@@ -225,6 +235,7 @@ namespace Graphen
         public Knoten Start;
         public Knoten Ende;
         public double? Weight;
+        public double? Capacity;
         public bool Directed;
 
         public Kante(Knoten start, Knoten end, double? weight = null, bool directed = false)
@@ -233,6 +244,12 @@ namespace Graphen
             Ende = end;
             Weight = weight;
             Directed = directed;
+        }
+
+        public Kante(Knoten start, Knoten end, double? weight = null, double? capacity = null, bool directed = false)
+            : this(start, end, weight, directed)
+        {
+            Capacity = capacity;
         }
 
         // Adds itself to the nodes
