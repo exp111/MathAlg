@@ -43,10 +43,9 @@ namespace Graphen
                 while (queue.Count > 0)
                 {
                     var node = queue.Dequeue();
-                    // search neighbours
-                    foreach (var edge in node.Kanten)
+                    // search neighbours (we need to search all cause we may need to use a backedge which isn't originally marked)
+                    foreach (var other in graph.Knoten)
                     {
-                        var other = edge.Other(node);
                         // dont add if the node was already added (and maybe even searched)
                         if (marked[other.ID])
                             continue;
@@ -57,6 +56,7 @@ namespace Graphen
                             continue;
 
                         prev[other.ID] = node.ID;
+                        // can only transfer as much as we can carry/carried till here
                         cost[other.ID] = Math.Min(cost[node.ID], residual);
 
                         if (other.ID == endID)
@@ -79,14 +79,16 @@ namespace Graphen
 
                 maxFlow += flow;
                 var v = endID;
+                var path = $"{v}";
                 while (v != startID)
                 {
                     var u = P[v];
+                    path += $"->{u}";
                     F[u][v] += flow;
                     F[v][u] -= flow;
                     v = u;
                 }
-                Console.WriteLine($"round {maxFlow} ({flow}): ");
+                Console.WriteLine($"round: flow: {maxFlow} ({flow}); path: {path}");
             }
 
             return maxFlow;

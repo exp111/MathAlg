@@ -78,12 +78,16 @@ foreach (var fileName in files)
     var graph = Graph.FromTextFile(@"flows\Fluss.txt", true, true);
     File.WriteAllLines("out/Fluss.graphml", graph.ExportToGraphML());
     var a = graph.EdmondsKarp(0, 7);
-    Console.WriteLine(a);
+    Console.WriteLine(a); //4
 
     graph = Graph.FromTextFile(@"flows\debug.txt", true, true);
     File.WriteAllLines("out/debug.graphml", graph.ExportToGraphML());
     a = graph.EdmondsKarp(0, 4);
-    Console.WriteLine(a);
+    Console.WriteLine(a); //12
+    graph = Graph.FromTextFile(@"flows\debug2.txt", true, true);
+    File.WriteAllLines("out/debug2.graphml", graph.ExportToGraphML());
+    a = graph.EdmondsKarp(5, 4);
+    Console.WriteLine(a); //19
     //var graph = Graph.FromTextFile("G_D_4_4_cycle.txt", true);
     //graph.Dijkstra(0, 3);
 }
