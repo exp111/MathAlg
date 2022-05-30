@@ -43,7 +43,7 @@ namespace Graphen
                 while (queue.Count > 0)
                 {
                     var node = queue.Dequeue();
-                    // search neighbours (we need to search all cause we may need to use a backedge which isn't originally marked)
+                    // search neighbours (we need to search all cause we may need to use a backedge which isn't originally connected)
                     foreach (var other in graph.Knoten)
                     {
                         // dont add if the node was already added (and maybe even searched)
@@ -79,16 +79,13 @@ namespace Graphen
 
                 maxFlow += flow;
                 var v = endID;
-                var path = $"{v}";
                 while (v != startID)
                 {
                     var u = P[v];
-                    path += $"->{u}";
                     F[u][v] += flow;
                     F[v][u] -= flow;
                     v = u;
                 }
-                Console.WriteLine($"round: flow: {maxFlow} ({flow}); path: {path}");
             }
 
             return maxFlow;
