@@ -17,7 +17,7 @@ namespace Graphen
             Knoten = new(num);
             for (var i = 0; i < num; i++)
             {
-                var node = new Knoten(i);
+                var node = new Knoten(i, 0);
                 Knoten.Add(node);
             }
         }
@@ -135,6 +135,94 @@ namespace Graphen
             return new Graph(0);
         }
 
+        public static Graph FromTextFileBalance(string fileName, bool directed = false)
+        {
+            try
+            {
+                Graph graph;
+                int[] edgeCount;
+                var file = File.OpenRead(fileName);
+                using (var reader = new StreamReader(file))
+                {
+                    // first line is the amount of nodes
+                    var line = reader.ReadLine()!.TrimEnd();
+                    var amount = int.Parse(line);
+                    graph = new Graph(amount);//, lines.Length - 1);
+                    // Contains the edgecount for each node, so we can allocate them in one batch instead of needing to resize
+                    edgeCount = new int[amount];
+
+                    // reads balance values into array, so it can be used afterwards
+                    var balance = new double[amount];
+                    for (var i = 0; i < amount; i++)
+                    {
+                        var nextLine = reader.ReadLine();
+                        if (nextLine == null)
+                            throw new Exception("not enough lines for balance");
+                        graph.Knoten[i].Balance = double.Parse(nextLine.TrimEnd(), NumberStyles.Float, CultureInfo.InvariantCulture);
+                    }
+
+                    var index = 0;
+                    // rest of the lines are the edges in the format "fromID    toID    weight" (weight being optional)
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        // split by \t, essentially equal to line.Split("\t");
+                        var span = line.AsSpan();
+                        var firstIndex = span.IndexOf("\t");
+                        var first = span[..firstIndex];
+                        span = span[(firstIndex + 1)..]; // move string forward to ignore first \t
+                        var secondIndex = span.IndexOf("\t");
+                        ReadOnlySpan<char> second = span;
+                        double? weight = null;
+                        double? capacity = null;
+                        second = span[..secondIndex];
+                        span = span[(secondIndex + 1)..]; // move forward
+                        var thirdIndex = span.IndexOf("\t");
+                        var third = span[..thirdIndex];
+                        var fourth = span[(thirdIndex + 1)..];
+                        weight = double.Parse(third.TrimEnd(), NumberStyles.Float, CultureInfo.InvariantCulture);
+                        capacity = double.Parse(fourth.TrimEnd(), NumberStyles.Float, CultureInfo.InvariantCulture);
+
+                        // parse them into ints
+                        var fromID = int.Parse(first);
+                        var toID = int.Parse(second); // trim \r\n from the right side
+                        // put the edge into the graph
+                        var edge = new Kante(graph.Knoten[fromID], graph.Knoten[toID], weight, capacity, directed);
+                        // increase the allocation count
+                        edgeCount[fromID]++;
+                        edgeCount[toID]++;
+                        // only add to the main list rn
+                        graph.Kanten.Add(edge);
+                        index++;
+                    }
+                }
+
+                // Now allocate the lists
+                foreach (var node in graph.Knoten)
+                {
+                    node.Kanten = new(edgeCount[node.ID]);
+                }
+
+                // then add the edge reference to the nodes
+                foreach (var edge in graph.Kanten)
+                {
+                    edge.AddReference();
+                }
+
+                return graph;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception during Graph.FromTextFile: {ex}");
+            }
+
+            return new Graph(0);
+        }
+
+        public void AddNode(Knoten node)
+        {
+            Knoten.Add(node);
+        }
+
         public void AddKante(Kante edge)
         {
             Kanten.Add(edge);
@@ -170,10 +258,16 @@ namespace Graphen
     {
         public int ID;
         public List<Kante> Kanten;
+        public double? Balance;
 
         internal Knoten(int id)
         {
             ID = id;
+        }
+
+        internal Knoten(int id, double balance) : this(id)
+        {
+            Balance = balance;
         }
 
         public Knoten(int id, int allocate)
@@ -181,6 +275,13 @@ namespace Graphen
             ID = id;
             Kanten = new(allocate);
         }
+
+        public Knoten(int id, int allocate, double balance) : this(id, allocate)
+        {
+            Balance = balance;
+        }
+
+        
 
         public int KantenAnzahl => Kanten == null ? Kanten!.Count : 0;
 
@@ -268,10 +369,13 @@ namespace Graphen
 
         public override string ToString()
         {
+            var str = "";
             if (Weight.HasValue)
-                return $"From: {Start.ID}, To: {Ende.ID}, Weight: {Weight}, Directed: {Directed}";
-            else
-                return $"From: {Start.ID}, To: {Ende.ID}, Directed: {Directed}";
+                str += $"Weight: {Weight}, ";
+            if (Capacity.HasValue)
+                str += $"Capacity: {Capacity}, ";
+            
+            return $"From: {Start.ID}, To: {Ende.ID}, {str}Directed: {Directed}";
         }
     }
 
@@ -334,6 +438,31 @@ namespace Graphen
         public double GetShortestPathWeight(int endID)
         {
             return Dist[endID];
+        }
+
+        // Returns a list of edges that form a negative cycle (required the given edge is in a negative cycle)
+        public List<Kante> GetNegativeCycle(Kante edge)
+        {
+            List<Kante> edges = new();
+            var cur = edge.Ende.ID;
+            // max N-1 edges
+            for (var i = 0; i < Graph.KnotenAnzahl - 1; i++)
+            {
+                // get predecessor
+                var next = Pred[cur];
+                // get edge between them
+                var e = Graph.GetEdge(next, cur);
+                if (e == null)
+                    throw new Exception("couldn't find a edge in negative cycle?");
+                // check if edge is in list => yes? we're back at the beginning //TODO: use marked?
+                if (edges.Contains(e))
+                    return edges;
+                // add edge to list (cause we used it)
+                edges.Add(e);
+                // look from predecessor
+                cur = next;
+            }
+            return edges;
         }
     }
 }

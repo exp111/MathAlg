@@ -75,7 +75,7 @@ foreach (var fileName in files)
 }
 
 {
-    var graph = Graph.FromTextFile(@"flows\Fluss.txt", true, true);
+    /*var graph = Graph.FromTextFile(@"flows\Fluss.txt", true, true);
     File.WriteAllLines("out/Fluss.graphml", graph.ExportToGraphML());
     var a = graph.EdmondsKarp(0, 7);
     Console.WriteLine(a); //4
@@ -87,7 +87,12 @@ foreach (var fileName in files)
     graph = Graph.FromTextFile(@"flows\debug2.txt", true, true);
     File.WriteAllLines("out/debug2.graphml", graph.ExportToGraphML());
     a = graph.EdmondsKarp(5, 4);
-    Console.WriteLine(a); //19
+    Console.WriteLine(a); //19*/
     //var graph = Graph.FromTextFile("G_D_4_4_cycle.txt", true);
     //graph.Dijkstra(0, 3);
+
+    var graph = Graph.FromTextFileBalance(@"minimal_flows\Kostenminimal1.txt", true);
+    var a = graph.CycleCanceling(); // 3
+    Console.WriteLine(a);
+    //TODO: test if negative cycle finding works
 }

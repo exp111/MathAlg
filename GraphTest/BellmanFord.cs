@@ -64,7 +64,7 @@ namespace GraphTest
                 var (tree, cycle) = graph.BellmanFord(startID);
                 //TODO: get path to endID
                 double? weight;
-                if (tree != null)
+                if (cycle == null)
                 {
                     weight = tree.GetShortestPathWeight(endID);
                     var path = tree.GetShortestPath(endID)!;
