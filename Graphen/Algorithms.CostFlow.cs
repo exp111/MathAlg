@@ -45,7 +45,7 @@ namespace Graphen
                     graph.AddKante(new(node, sink, 0, b * -1, true));
             }
 
-            // now run karp //TODO: why?
+            // now run karp to find a flow that fulfills all balances (a b flow)
             var flow = graph.EdmondsKarp(source.ID, sink.ID, F);
             /* To check flow values
             for (var i = 0; i < F.Length; i++)
@@ -56,6 +56,7 @@ namespace Graphen
                 }
                 Console.WriteLine();
             }*/
+            // if the maximum flow is not equal the max out of the source, we haven't fulfilled the balance
             return flow == sourceFlow;
         }
 
@@ -116,10 +117,9 @@ namespace Graphen
                 return null;
 
             return tree!.GetNegativeCycle(edge);
-        }     
+        }
 
-        // Calculates the minimum cost flow
-        /*
+        /* Calculates the minimum cost flow
          * Returns null if a b flow couldn't be created else the minimum 
          */
         public static double? CycleCanceling(this Graph graph)
@@ -166,9 +166,163 @@ namespace Graphen
             return cost;
         }
 
-        public static Graph SuccessiveShorestPath(this Graph graph)
+        public static double? SuccessiveShortestPath(this Graph graph)
         {
-            return new Graph(0);
+            // the current used flow
+            double[][] F = new double[graph.KnotenAnzahl][];
+            for (var i = 0; i < graph.KnotenAnzahl; i++)
+            {
+                F[i] = new double[graph.KnotenAnzahl];
+            }
+            // b'
+            double[] Bs = new double[graph.KnotenAnzahl];
+            // step 1: set flow to capacity if edge has negative weight
+            foreach (var edge in graph.Kanten)
+            {
+                if (edge.Weight < 0)
+                {
+                    var from = edge.Start.ID;
+                    var to = edge.Ende.ID;
+                    F[from][to] = edge.Capacity!.Value;
+                    F[to][from] = edge.Capacity!.Value * -1;
+                }
+            }
+            
+            while (true)
+            {
+                var residual = CreateResidualGraph(graph, F);
+                
+                // step 2: select connected nodes s with b - b' > 0 and t with b - b' < 0 (can still be improved)
+                // find suitable nodes
+                var srcCanidates = new List<Knoten>();
+                var dstCanidates = new List<Knoten>();
+                foreach (var node in graph.Knoten)
+                {
+                    // calculate b'
+                    var b = 0d;
+                    // check outgoing flows from node and add them to balance
+                    foreach (var outgoing in F[node.ID])
+                    {
+                        if (outgoing > 0)
+                            b += outgoing;
+                    }
+                    // check incoming flows to node and subtract them from balance
+                    foreach (var flow in F)
+                    {
+                        var incoming = flow[node.ID];
+                        if (incoming > 0)
+                        {
+                            b -= incoming;
+                        }
+                    }
+
+                    Bs[node.ID] = b;
+                    if (node.Balance > b) // b - b' > 0 => potential s
+                        srcCanidates.Add(node);
+                    else if (node.Balance < b) // b - b' < 0 => potential t
+                        dstCanidates.Add(node);
+                }
+                // find s and t pair that is connected
+                bool PathExists(int startID, int endID)
+                {
+                    // uses bfs to find a path
+                    bool[] marked = new bool[graph.KnotenAnzahl];
+                    double[] cost = new double[graph.KnotenAnzahl];
+                    int[] prev = new int[graph.KnotenAnzahl];
+                    Queue<Knoten> queue = new();
+                    queue.Enqueue(graph.Knoten[startID]);
+                    // mark the start first (because we added it)
+                    marked[startID] = true;
+                    // set cost to inf
+                    cost[startID] = double.PositiveInfinity;
+                    while (queue.Count > 0)
+                    {
+                        var node = queue.Dequeue();
+                        // search neighbours (we need to search all cause we may need to use a backedge which isn't originally connected)
+                        foreach (var other in graph.Knoten)
+                        {
+                            // dont add if the node was already added (and maybe even searched)
+                            if (marked[other.ID])
+                                continue;
+
+                            // if a edge exists, use that capacity, otherwise use 0 (backedges have a cap of 0, so it works)
+                            var edge = node.GetEdge(other);
+                            var capacity = edge is not null ? edge.Capacity : 0;
+
+                            // still residual capacity? (capacity - used flow)
+                            var residual = capacity - F[node.ID][other.ID];
+                            if (residual <= 0)
+                                continue;
+
+                            if (other.ID == endID)
+                                return true;
+
+                            // mark so we dont add twice
+                            marked[other.ID] = true;
+                            queue.Enqueue(other);
+                        }
+                    }
+                    return false;
+                }
+
+                Knoten? s = null, t = null;
+                foreach (var src in srcCanidates)
+                {
+                    foreach (var dst in dstCanidates)
+                    {
+                        // check if reachable with a bfs => valid pair
+                        if (PathExists(src.ID, dst.ID))
+                        {
+                            s = src;
+                            t = dst;
+                            goto found;
+                        }
+                    }
+                }
+            found:
+                // if no such pair is found, we're either minimal or no b-flow can be created
+                if (s is null || t is null) 
+                    break;
+
+
+                // step 3: calc shortest path between s and t in residual
+                var (tree, cycleEdge) = residual.BellmanFord(s.ID);
+                if (cycleEdge != null) // can we ignore this?
+                    throw new Exception("Found negative cycle!");
+                var path = tree.GetShortestPath(t.ID);
+                if (path == null)
+                    throw new Exception("Couldn't find a shortest path (impossible challenge)!");
+                // get minimum from
+                var min = path!.Min(e => e.Capacity - F[e.Start.ID][e.Ende.ID])!.Value;
+                min = Math.Min(min, // remainder on path
+                    Math.Min(s.Balance!.Value - Bs[s.ID], // b(s) - b'(s)
+                        Math.Abs(Bs[t.ID] - t.Balance!.Value))); // b'(t) - b(t) //TODO: do we need the abs
+
+                // step 4: update flow along the path
+                foreach (var edge in path)
+                {
+                    var from = edge.Start.ID;
+                    var to = edge.Ende.ID;
+                    F[from][to] += min;
+                    F[to][from] -= min;
+                }
+            }
+
+            // check if the flow is minimal (by checking if b == b' for all nodes)
+            foreach (var node in graph.Knoten)
+            {
+                if (node.Balance != Bs[node.ID])
+                    return null; // not minimal => no b-flow
+            }
+
+            // calculate cost
+            var cost = 0d;
+            foreach (var edge in graph.Kanten)
+            {
+                cost += edge.Weight!.Value * F[edge.Start.ID][edge.Ende.ID];
+            }
+
+            return cost;
         }
     }
 }

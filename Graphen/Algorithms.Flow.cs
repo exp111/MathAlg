@@ -8,6 +8,7 @@ namespace Graphen
 {
     public static partial class Algorithms
     {
+        // Returns the maximum flow inside the flow network (graph)
         public static double EdmondsKarp(this Graph graph, int startID, int endID, double[][] F)
         {
             double maxFlow = 0;
