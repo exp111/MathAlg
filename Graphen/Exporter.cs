@@ -46,5 +46,11 @@ namespace Graphen
             }
             return Array.Empty<string>();
         }
+
+        // writes the graphml file directly into filename (relative path)
+        public static void WriteGraphML(this Graph graph, string filename)
+        {
+            File.WriteAllLines(filename, graph.ExportToGraphML());
+        }
     }
 }

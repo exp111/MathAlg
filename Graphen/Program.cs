@@ -91,8 +91,19 @@ foreach (var fileName in files)
     //var graph = Graph.FromTextFile("G_D_4_4_cycle.txt", true);
     //graph.Dijkstra(0, 3);
 
-    var graph = Graph.FromTextFileBalance(@"minimal_flows\Kostenminimal1.txt", true);
-    var a = graph.CycleCanceling(); // 3
-    Console.WriteLine(a);
-    //TODO: test if negative cycle finding works
+    {
+        var graph = Graph.FromTextFileBalance(@"minimal_flows\Kostenminimal1.txt", true);
+        var a = graph.CycleCanceling(); // 3
+        Console.WriteLine(a);
+    }
+
+    {
+        // tests negative cycle
+        var graph = Graph.FromTextFile(@"path\Wege3.txt", true);
+        var (tree, edge) = graph.BellmanFord(2);
+        Console.WriteLine(edge);
+        File.WriteAllLines("out/Wege3.graphml", graph.ExportToGraphML());
+        var cycle = tree.GetNegativeCycle(edge!);
+        Console.WriteLine(string.Join(",",cycle.Select(a => $"{a.Start.ID}->{a.Ende.ID}")));
+    }
 }

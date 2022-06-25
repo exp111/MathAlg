@@ -63,7 +63,7 @@ namespace Graphen
         }
 
         // Returns the shortest path tree and a edge inside a negative cycle, if one exists
-        public static (ShortestPathTree?, Kante?) BellmanFord(this Graph graph, int startID = 0)
+        public static (ShortestPathTree, Kante?) BellmanFord(this Graph graph, int startID = 0)
         {
             var dist = new double[graph.KnotenAnzahl];
             var pred = new int[graph.KnotenAnzahl];
