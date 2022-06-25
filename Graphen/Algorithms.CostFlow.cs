@@ -103,9 +103,9 @@ namespace Graphen
 
         // Calculates the minimum cost flow
         /*
-         * Returns NaN if a b flow couldn't be created else the minimum 
+         * Returns null if a b flow couldn't be created else the minimum 
          */
-        public static double CycleCanceling(this Graph graph)
+        public static double? CycleCanceling(this Graph graph)
         {
             // the current used flow
             double[][] F = new double[graph.KnotenAnzahl + 2][]; //+2 cuz we need to add the supersink + src
@@ -117,7 +117,7 @@ namespace Graphen
             // Step 1: calculate b flow
             var exists = CalculateBFlow(graph, F);
             if (!exists)
-                return double.NaN;
+                return null;
 
             while (true)
             {
@@ -148,7 +148,6 @@ namespace Graphen
 
             return cost;
         }
-        //TODO: tests
 
         public static Graph SuccessiveShorestPath(this Graph graph)
         {

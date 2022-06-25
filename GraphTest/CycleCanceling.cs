@@ -11,34 +11,58 @@ using System.Threading.Tasks;
 
 namespace GraphTest
 {
-    internal class EdmondsKarp
+    internal class CycleCanceling
     {
         [SetUp]
         public void Setup()
         {
-            Directory.SetCurrentDirectory(@"E:\D\Visual Studio\Uni\MathAlg\Graphen\data\");
+            Directory.SetCurrentDirectory(@"E:\D\Visual Studio\Uni\MathAlg\Graphen\data\minimal_flows");
         }
 
         [Test]
         public void TestFluss1()
         {
-            Assert.AreEqual("4.00", EdmondsKarpTest(@"flows\Fluss", 0, 7)!.Value.ToString("0.00", CultureInfo.InvariantCulture));
+            Assert.AreEqual("3.00", CycleCancelingTest("Kostenminimal1")!.Value.ToString("0.00", CultureInfo.InvariantCulture));
         }
 
         [Test]
         public void TestFluss2()
         {
-            Assert.AreEqual("5.00", EdmondsKarpTest(@"flows\Fluss2", 0, 7)!.Value.ToString("0.00", CultureInfo.InvariantCulture));
+            Assert.AreEqual("0.00", CycleCancelingTest("Kostenminimal2")!.Value.ToString("0.00", CultureInfo.InvariantCulture));
         }
 
         [Test]
-        public void TestG_1_2()
+        public void TestFluss3()
         {
-            Assert.AreEqual("0.75447", EdmondsKarpTest(@"weighted\G_1_2", 0, 7)!.Value.ToString("0.00000", CultureInfo.InvariantCulture));
+            Assert.IsNull(CycleCancelingTest("Kostenminimal3"));
+        }
+
+        [Test]
+        public void TestFluss4()
+        {
+            Assert.IsNull(CycleCancelingTest("Kostenminimal4"));
+        }
+
+        [Test]
+        public void TestFlussGross1()
+        {
+            Assert.AreEqual("1537.00", CycleCancelingTest("Kostenminimal_gross1")!.Value.ToString("0.00", CultureInfo.InvariantCulture));
+        }
+
+        [Test]
+        public void TestFlussGross2()
+        {
+            Assert.AreEqual("1838.00", CycleCancelingTest("Kostenminimal_gross2")!.Value.ToString("0.00", CultureInfo.InvariantCulture));
+        }
+
+        [Test]
+        public void TestFlussGross3()
+        {
+            Assert.IsNull(CycleCancelingTest("Kostenminimal_gross3"));
         }
 
         // Returns the length of the path or null if there is no path
-        private double? EdmondsKarpTest(string fileName, int startID, int endID)
+        private double? CycleCancelingTest(string fileName)
         {
             try
             {
@@ -46,11 +70,11 @@ namespace GraphTest
                 stopwatch.Start();
                 Console.WriteLine($"Reading {fileName}");
                 var file = $"{fileName}.txt";
-                Graph graph = Graph.FromTextFile(file, true, true);
+                Graph graph = Graph.FromTextFileBalance(file, true);
                 Console.WriteLine($"Read {fileName} ({graph.KnotenAnzahl} Knoten, {graph.KantenAnzahl} Kanten)");
                 var readTime = stopwatch.Elapsed;
-                var flow = graph.EdmondsKarp(startID, endID);
-                Console.WriteLine($"Edmonds-Karp: {flow}");
+                var flow = graph.CycleCanceling();
+                Console.WriteLine($"Cycle Canceling: {flow}");
                 stopwatch.Stop();
                 var time = stopwatch.Elapsed;
                 Console.WriteLine($"{fileName} took {(int)time.TotalMilliseconds} ms ({(int)time.TotalSeconds} seconds)");
@@ -61,7 +85,7 @@ namespace GraphTest
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Exception during EdmondsKarpTest: {ex}");
+                Console.WriteLine($"Exception during CycleCancelingTest: {ex}");
             }
             return 0;
         }
