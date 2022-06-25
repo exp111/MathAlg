@@ -74,7 +74,7 @@ namespace GraphTest
                 Console.WriteLine($"Read {fileName} ({graph.KnotenAnzahl} Knoten, {graph.KantenAnzahl} Kanten)");
                 var readTime = stopwatch.Elapsed;
                 var flow = graph.CycleCanceling();
-                Console.WriteLine($"Cycle Canceling: {flow}");
+                Console.WriteLine($"Cycle Canceling: {(flow.HasValue ? flow : "No b-flow found")}");
                 stopwatch.Stop();
                 var time = stopwatch.Elapsed;
                 Console.WriteLine($"{fileName} took {(int)time.TotalMilliseconds} ms ({(int)time.TotalSeconds} seconds)");

@@ -445,8 +445,15 @@ namespace Graphen
         {
             List<Kante> edges = new();
             var cur = edge.Ende.ID;
-            // max N-1 edges
-            for (var i = 0; i < Graph.KnotenAnzahl - 1; i++)
+            // go back N - 1 times
+            for (var i = 0; i < Graph.KnotenAnzahl; i++)
+            {
+                cur = Pred[cur];
+            }
+            // save the beginning/end of the cycle so we can check for it later
+            var end = cur;
+            // now find the cycle by going back till we find a double edge
+            for (var i = 0; i < Graph.KnotenAnzahl; i++)
             {
                 // get predecessor
                 var next = Pred[cur];
@@ -454,13 +461,12 @@ namespace Graphen
                 var e = Graph.GetEdge(next, cur);
                 if (e == null)
                     throw new Exception("couldn't find a edge in negative cycle?");
-                // check if edge is in list => yes? we're back at the beginning //TODO: use marked?
-                if (edges.Contains(e))
-                    return edges;
                 // add edge to list (cause we used it)
                 edges.Add(e);
                 // look from predecessor
                 cur = next;
+                if (cur == end) // reached the beginning of the cycle => end it
+                    break;
             }
             return edges;
         }

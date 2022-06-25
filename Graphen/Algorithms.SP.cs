@@ -117,6 +117,7 @@ namespace Graphen
                 // if it would, we got a negative cycle
                 if (dist[edge.Start.ID] + edge.Weight!.Value < dist[edge.Ende.ID])
                     return (new(graph, dist, pred), edge);
+                //note: what we return here isnt a valid shortest tree path technically, but we need the pred array
             }
 
 

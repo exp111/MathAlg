@@ -47,6 +47,15 @@ namespace Graphen
 
             // now run karp //TODO: why?
             var flow = graph.EdmondsKarp(source.ID, sink.ID, F);
+            /* To check flow values
+            for (var i = 0; i < F.Length; i++)
+            {
+                for (var j = 0; j < F.Length; j++)
+                {
+                    Console.Write($"{F[i][j]} ");
+                }
+                Console.WriteLine();
+            }*/
             return flow == sourceFlow;
         }
 
@@ -93,8 +102,16 @@ namespace Graphen
         // Returns a negative cycle or null if none exists
         public static List<Kante>? GetNegativeCycle(Graph graph)
         {
-            
-            var (tree, edge) = graph.BellmanFord();
+            // create new super node to search from
+            var node = new Knoten(graph.KnotenAnzahl, 0, 0);
+            graph.AddNode(node);
+            foreach (var n in graph.Knoten)
+            {
+                graph.AddKante(new Kante(node, n, 0, 0, true));
+            }
+            //note: we don't need to delete this since we throw the graph away anyways
+
+            var (tree, edge) = graph.BellmanFord(node.ID);
             if (edge == null) // no cycle found
                 return null;
 
