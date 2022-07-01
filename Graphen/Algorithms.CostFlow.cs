@@ -10,12 +10,17 @@ namespace Graphen
     {
         public static bool CalculateBFlow(Graph graph, double[][] F)
         {
+            // flow from the super source/sink
             var sourceFlow = 0d;
             var sinkFlow = 0d;
 
-            List<Knoten> nodes = new();
+            // create supersource + sink and add them to the graph
+            var source = new Knoten(graph.KnotenAnzahl, 0, 0);
+            graph.AddNode(source);
+            var sink = new Knoten(graph.KnotenAnzahl, 0, 0);
+            graph.AddNode(sink);
 
-            // calculate the source balance from every source (and sink balance from every sink)
+            // link supersource to sources, sinks to supersink
             foreach (var node in graph.Knoten)
             {
                 var b = node.Balance!.Value;
@@ -23,41 +28,21 @@ namespace Graphen
                     continue;
 
                 if (b > 0)
-                    sourceFlow += b;
-                else
-                    sinkFlow += b;
-                nodes.Add(node);
-            }
-
-            // create supersource + sink and add them to the graph
-            var source = new Knoten(graph.KnotenAnzahl, 0, sourceFlow);
-            graph.AddNode(source);
-            var sink = new Knoten(graph.KnotenAnzahl, 0, sinkFlow);
-            graph.AddNode(sink);
-
-            // link supersource to sources, sinks to supersink
-            foreach (var node in nodes)
-            {
-                var b = node.Balance!.Value;
-                if (b > 0)
+                {
                     graph.AddKante(new(source, node, 0, b, true));
+                    sourceFlow += b;
+                }
                 else
+                {
                     graph.AddKante(new(node, sink, 0, b * -1, true));
+                    sinkFlow += b * -1;
+                }
             }
 
             // now run karp to find a flow that fulfills all balances (a b flow)
             var flow = graph.EdmondsKarp(source.ID, sink.ID, F);
-            /* To check flow values
-            for (var i = 0; i < F.Length; i++)
-            {
-                for (var j = 0; j < F.Length; j++)
-                {
-                    Console.Write($"{F[i][j]} ");
-                }
-                Console.WriteLine();
-            }*/
-            // if the maximum flow is not equal the max out of the source, we haven't fulfilled the balance
-            return flow == sourceFlow;
+            // if the maximum flow is not equal the max out of the source/into the sink, we haven't fulfilled the balance
+            return flow == sourceFlow && flow == sinkFlow; //TODO: probably do some epsilon shit
         }
 
         // Creates a residual graph from the graph and the 
@@ -166,6 +151,9 @@ namespace Graphen
             return cost;
         }
 
+        /* Calculates the minimum cost flow
+         * Returns null if a b flow couldn't be created else the minimum 
+         */
         public static double? SuccessiveShortestPath(this Graph graph)
         {
             // the current used flow
@@ -188,6 +176,7 @@ namespace Graphen
                 }
             }
             
+            //TODO: initialize Bs here
             while (true)
             {
                 var residual = CreateResidualGraph(graph, F);
@@ -200,21 +189,9 @@ namespace Graphen
                 {
                     // calculate b'
                     var b = 0d;
-                    // check outgoing flows from node and add them to balance
-                    foreach (var outgoing in F[node.ID])
-                    {
-                        if (outgoing > 0)
-                            b += outgoing;
-                    }
-                    // check incoming flows to node and subtract them from balance
-                    foreach (var flow in F)
-                    {
-                        var incoming = flow[node.ID];
-                        if (incoming > 0)
-                        {
-                            b -= incoming;
-                        }
-                    }
+                    // check flows from/to node and add/subtract them to balance
+                    foreach (var flow in F[node.ID])
+                        b += flow;
 
                     Bs[node.ID] = b;
                     if (node.Balance > b) // b - b' > 0 => potential s
@@ -266,8 +243,11 @@ namespace Graphen
                 }
 
                 Knoten? s = null, t = null;
+                //TODO: always take first non blacklisted src and blacklist it if we cant find sink
                 foreach (var src in srcCanidates)
                 {
+                    //TODO: look which nodes are reachable from src, then check if dsts is under them
+
                     foreach (var dst in dstCanidates)
                     {
                         // check if reachable with a bfs => valid pair
@@ -306,6 +286,7 @@ namespace Graphen
                     F[from][to] += min;
                     F[to][from] -= min;
                 }
+                //TODO: update Bs here instead of every loop (s + t)
             }
 
             // check if the flow is minimal (by checking if b == b' for all nodes)
